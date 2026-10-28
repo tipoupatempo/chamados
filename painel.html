@@ -212,6 +212,8 @@
     .acoes { border: 1px solid var(--borda); border-radius: var(--raio); padding: 16px; margin: 20px 0; }
     .acoes .botoes { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
     .acoes textarea { min-height: 80px; }
+    .modal { position: fixed; z-index: 12; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100% - 32px)); max-height: calc(100% - 32px); overflow-y: auto; }
+    .botoes-modal { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
     .tag-interna { font-size: 11px; background: var(--fundo); border: 1px solid var(--borda); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
 
     @media (max-width: 900px) {
@@ -240,6 +242,7 @@
       <div class="marca"><small class="titulo-equipe"></small><strong class="unidade"></strong></div>
       <div class="usuario oculto" id="barra-usuario">
         <span id="nome-usuario"></span>
+        <button type="button" class="botao botao-claro" id="abrir-troca">Trocar senha</button>
         <button type="button" class="botao botao-claro" id="sair">Sair</button>
       </div>
     </div>
@@ -313,13 +316,40 @@
     </aside>
   </div>
 
+  <!-- Trocar senha -->
+  <div id="troca" class="oculto">
+    <div class="fundo-gaveta" id="fundo-troca"></div>
+    <form class="cartao modal" id="form-troca" role="dialog" aria-modal="true" aria-labelledby="troca-titulo" novalidate>
+      <h2 id="troca-titulo">Trocar senha</h2>
+      <p class="sub" id="troca-aviso"></p>
+      <div id="erro-troca" class="alerta alerta-erro oculto" role="alert"></div>
+      <div class="campo" id="campo-atual">
+        <label for="t-atual">Senha atual</label>
+        <input type="password" id="t-atual" autocomplete="current-password">
+      </div>
+      <div class="campo">
+        <label for="t-nova">Nova senha <span class="dica">(mínimo 6 caracteres)</span></label>
+        <input type="password" id="t-nova" autocomplete="new-password">
+      </div>
+      <div class="campo">
+        <label for="t-confirma">Repita a nova senha</label>
+        <input type="password" id="t-confirma" autocomplete="new-password">
+      </div>
+      <div class="botoes-modal">
+        <button type="button" class="botao botao-secundario" id="t-cancelar">Cancelar</button>
+        <button type="submit" class="botao botao-primario" id="t-salvar">Salvar nova senha</button>
+      </div>
+    </form>
+  </div>
+
   <script type="text/plain" id="principal">
     const APP = window.APP;
     const $ = s => document.querySelector(s);
     const FINAIS = ['Concluído', 'Cancelado'];
     const PESO_PRIORIDADE = { 'Urgente': 0, 'Alta': 1, 'Média': 2, 'Baixa': 3 };
     const CHAVE_SESSAO = 'chamados.sessao.' + APP.equipe; // TI e Manutenção podem estar no mesmo endereço
-    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null };
+    // senhaLogin: só em memória, para não pedir a senha provisória de novo na troca obrigatória
+    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null, senhaLogin: null, trocaObrigatoria: false };
 
     preencherCabecalho('Painel de ');
     $('#titulo-login').textContent = 'Painel de ' + APP.equipe;
@@ -344,17 +374,30 @@
           encerrar('Sua sessão expirou. Entre novamente.');
           throw new Error('Sessão expirada.');
         }
+        if (/TROCAR_SENHA/.test(mensagemErro(e))) {
+          abrirTroca(true);
+          throw new Error('Crie sua senha pessoal para continuar.');
+        }
         throw e;
       }
     }
 
+    function salvarSessao() {
+      try { sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify(estado.sessao)); } catch (e) { /* sem armazenamento */ }
+    }
+
     function iniciar(sessao) {
       estado.sessao = sessao;
-      try { sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao)); } catch (e) { /* sem armazenamento */ }
+      salvarSessao();
       $('#nome-usuario').textContent = sessao.nome;
       $('#barra-usuario').classList.remove('oculto');
       $('#tela-login').classList.add('oculto');
       $('#tela-painel').classList.remove('oculto');
+      if (sessao.deveTrocar) abrirTroca(true);
+      else liberarPainel();
+    }
+
+    function liberarPainel() {
       carregar();
       clearInterval(estado.timer);
       estado.timer = setInterval(() => { if (!document.hidden) carregar(true); }, 60000);
@@ -363,8 +406,10 @@
     function encerrar(aviso) {
       if (estado.sessao && !aviso) chamar('sair', estado.sessao.token).catch(() => {});
       estado.sessao = null;
+      estado.senhaLogin = null;
       clearInterval(estado.timer);
       try { sessionStorage.removeItem(CHAVE_SESSAO); } catch (e) { /* sem armazenamento */ }
+      fecharTroca();
       fecharDetalhe();
       $('#barra-usuario').classList.add('oculto');
       $('#tela-painel').classList.add('oculto');
@@ -382,8 +427,11 @@
       botao.disabled = true;
       botao.innerHTML = '<span class="girando"></span> Entrando…';
       try {
-        iniciar(await chamar('entrar', $('#usuario').value.trim(), $('#senha').value));
+        const senha = $('#senha').value;
+        const sessao = await chamar('entrar', $('#usuario').value.trim(), senha);
+        estado.senhaLogin = sessao.deveTrocar ? senha : null;
         $('#senha').value = '';
+        iniciar(sessao);
       } catch (e) {
         $('#erro-login').textContent = mensagemErro(e);
         $('#erro-login').classList.remove('oculto');
@@ -393,6 +441,69 @@
       }
     });
     $('#sair').addEventListener('click', () => encerrar());
+
+    // ---------- Trocar senha ----------
+
+    // obrigatoria: primeiro acesso ou senha redefinida; o painel só libera depois da troca
+    function abrirTroca(obrigatoria) {
+      estado.trocaObrigatoria = !!obrigatoria;
+      const temSenhaLogin = obrigatoria && !!estado.senhaLogin;
+      $('#troca-aviso').textContent = obrigatoria
+        ? 'Você entrou com uma senha provisória. Crie sua senha pessoal para continuar.'
+        : '';
+      $('#troca-aviso').classList.toggle('oculto', !obrigatoria);
+      $('#campo-atual').classList.toggle('oculto', temSenhaLogin);
+      $('#t-cancelar').classList.toggle('oculto', !!obrigatoria);
+      $('#erro-troca').classList.add('oculto');
+      ['#t-atual', '#t-nova', '#t-confirma'].forEach(s => { $(s).value = ''; });
+      $('#troca').classList.remove('oculto');
+      document.body.style.overflow = 'hidden';
+      (temSenhaLogin ? $('#t-nova') : $('#t-atual')).focus();
+    }
+
+    function fecharTroca() {
+      $('#troca').classList.add('oculto');
+      if (!estado.atual) document.body.style.overflow = '';
+    }
+
+    function erroTroca(msg) {
+      $('#erro-troca').textContent = msg;
+      $('#erro-troca').classList.remove('oculto');
+    }
+
+    $('#abrir-troca').addEventListener('click', () => abrirTroca(false));
+    $('#t-cancelar').addEventListener('click', fecharTroca);
+    $('#fundo-troca').addEventListener('click', () => { if (!estado.trocaObrigatoria) fecharTroca(); });
+
+    $('#form-troca').addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const atual = $('#campo-atual').classList.contains('oculto') ? estado.senhaLogin : $('#t-atual').value;
+      const nova = $('#t-nova').value;
+      if (!atual) return erroTroca('Informe a senha atual.');
+      if (nova.length < 6) return erroTroca('A nova senha precisa ter pelo menos 6 caracteres.');
+      if (nova !== $('#t-confirma').value) return erroTroca('As duas senhas novas não são iguais.');
+
+      const botao = $('#t-salvar');
+      botao.disabled = true;
+      botao.innerHTML = '<span class="girando"></span> Salvando…';
+      try {
+        await chamar('trocarSenha', estado.sessao.token, atual, nova);
+        estado.senhaLogin = null;
+        fecharTroca();
+        if (estado.sessao.deveTrocar) {
+          estado.sessao.deveTrocar = false;
+          salvarSessao();
+          liberarPainel();
+        }
+        $('#atualizado').textContent = 'Senha alterada com sucesso.';
+      } catch (e) {
+        if (/SESSAO_EXPIRADA/.test(mensagemErro(e))) return encerrar('Sua sessão expirou. Entre novamente.');
+        erroTroca(mensagemErro(e));
+      } finally {
+        botao.disabled = false;
+        botao.textContent = 'Salvar nova senha';
+      }
+    });
 
     // ---------- Lista ----------
 
@@ -620,7 +731,11 @@
 
     $('#fechar').addEventListener('click', fecharDetalhe);
     $('#fundo-gaveta').addEventListener('click', fecharDetalhe);
-    document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && estado.atual) fecharDetalhe(); });
+    document.addEventListener('keydown', ev => {
+      if (ev.key !== 'Escape') return;
+      if (!$('#troca').classList.contains('oculto')) { if (!estado.trocaObrigatoria) fecharTroca(); }
+      else if (estado.atual) fecharDetalhe();
+    });
 
     // Mantém o técnico logado ao recarregar a página (até a sessão expirar no servidor)
     try {
