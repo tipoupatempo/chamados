@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <style>
+  :root {
+    --azul: #0b5cad; --azul-escuro: #083f78; --azul-claro: #e8f1fb;
+    --verde: #1a7f4b; --verde-claro: #e3f4ea;
+    --laranja: #a65300; --laranja-claro: #fdf0e1;
+    --vermelho: #b42318; --vermelho-claro: #fdecea;
+    --roxo: #6941c6; --roxo-claro: #f1ecfb;
+    --texto: #1d2330; --texto-2: #4a5263; --texto-3: #6b7385;
+    --borda: #d5d9e0; --fundo: #f3f5f8; --superficie: #ffffff;
+    --raio: 10px;
+    --sombra: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .10);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px; line-height: 1.45;
+  }
+  a { color: var(--azul); }
+
+  .topo { background: var(--azul); color: #fff; padding: 12px 16px; }
+  .topo-conteudo { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .marca { display: flex; flex-direction: column; line-height: 1.2; }
+  .marca small { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .marca strong { font-size: 18px; }
+
+  .container { max-width: 760px; margin: 24px auto; padding: 0 16px; }
+  .cartao { background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); padding: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  h3 { font-size: 15px; margin: 0 0 10px; }
+  .sub { color: var(--texto-3); margin: 0 0 20px; }
+
+  .campo { margin-bottom: 16px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  .obrig { color: var(--vermelho); }
+  .dica { font-weight: 400; color: var(--texto-3); font-size: 13px; }
+  input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 8px;
+    font: inherit; color: inherit; background: #fff;
+  }
+  textarea { min-height: 110px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--azul); outline-offset: -1px; border-color: var(--azul); }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; margin-top: 8px; cursor: pointer; }
+  .check input { margin-top: 3px; }
+  .grade-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+  .botao {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px; border-radius: 8px; border: 1px solid transparent;
+    font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
+  }
+  .botao-primario { background: var(--azul); color: #fff; }
+  .botao-primario:hover { background: var(--azul-escuro); }
+  .botao-secundario { background: #fff; color: var(--texto); border-color: var(--borda); }
+  .botao-secundario:hover { background: var(--fundo); }
+  .botao-claro { background: rgba(255, 255, 255, .15); color: #fff; border-color: rgba(255, 255, 255, .35); padding: 7px 14px; }
+  .botao-claro:hover { background: rgba(255, 255, 255, .25); }
+  .botao[disabled] { opacity: .6; cursor: wait; }
+  .botao-bloco { width: 100%; padding: 13px; font-size: 16px; }
+
+  .alerta { padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+  .alerta-erro { background: var(--vermelho-claro); color: var(--vermelho); }
+  .alerta-info { background: var(--azul-claro); color: var(--azul-escuro); }
+
+  .selo { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .st-aberto { background: var(--azul-claro); color: var(--azul); }
+  .st-em-atendimento { background: var(--laranja-claro); color: var(--laranja); }
+  .st-aguardando { background: var(--roxo-claro); color: var(--roxo); }
+  .st-concluido { background: var(--verde-claro); color: var(--verde); }
+  .st-cancelado { background: var(--fundo); color: var(--texto-3); border: 1px solid var(--borda); }
+  .pr-urgente { background: var(--vermelho); color: #fff; }
+  .pr-alta { background: var(--vermelho-claro); color: var(--vermelho); }
+  .pr-media { background: var(--fundo); color: var(--texto-2); }
+  .pr-baixa { background: #fff; color: var(--texto-3); border: 1px solid var(--borda); }
+
+  .linha-tempo { list-style: none; margin: 0; padding: 0; }
+  .linha-tempo li { position: relative; padding: 0 0 16px 22px; }
+  .linha-tempo li::before { content: ""; position: absolute; left: 4px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--azul); }
+  .linha-tempo li::after { content: ""; position: absolute; left: 8px; top: 18px; bottom: 0; width: 1px; background: var(--borda); }
+  .linha-tempo li:last-child::after { display: none; }
+  .linha-tempo li.interna::before { background: var(--texto-3); }
+  .lt-meta { font-size: 12px; color: var(--texto-3); }
+  .lt-texto { white-space: pre-wrap; word-break: break-word; }
+
+  .rodape-links { text-align: center; margin: 20px 0 40px; font-size: 14px; color: var(--texto-3); }
+  .oculto { display: none !important; }
+  .girando { display: inline-block; width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: girar .7s linear infinite; vertical-align: -3px; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+
+  @media (max-width: 600px) {
+    .grade-2 { grid-template-columns: 1fr; }
+    .cartao { padding: 18px; }
+    .container { margin-top: 16px; }
+  }
+</style>
+<script>
+  // Duas formas de rodar: dentro do Google (google.script.run) ou na intranet (APP.api, via fetch).
+  function chamar(fn) {
+    const args = Array.prototype.slice.call(arguments, 1);
+    if (APP.api) return chamarApi(APP.api, fn, args);
+    return new Promise((ok, falha) => {
+      const runner = google.script.run.withSuccessHandler(ok).withFailureHandler(falha);
+      runner[fn].apply(runner, args);
+    });
+  }
+  // Sem cookies: o login do Google no navegador não interfere (evita o erro de várias contas)
+  async function chamarApi(url, acao, args) {
+    let r;
+    try {
+      r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ acao: acao, args: args || [] }),
+        credentials: 'omit',
+        redirect: 'follow'
+      });
+    } catch (e) {
+      throw new Error('Sem conexão com o servidor. Verifique a internet e tente de novo.');
+    }
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro);
+    return j.dados;
+  }
+  // Endereço de outra tela do sistema
+  function link(pagina, protocolo) {
+    const extra = protocolo ? 'protocolo=' + encodeURIComponent(protocolo) : '';
+    if (APP.api) return pagina + '.html?equipe=' + APP.chave + (extra ? '&' + extra : '');
+    const q = [pagina === 'abrir' ? '' : 'p=' + pagina, extra].filter(Boolean).join('&');
+    return APP.urlBase + (q ? '?' + q : '');
+  }
+  function mensagemErro(e) {
+    return String((e && e.message) || e).replace(/^(Exception|Error|Erro):\s*/i, '');
+  }
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function slug(v) {
+    return String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-');
+  }
+  function preencherCabecalho(prefixo) {
+    document.querySelectorAll('.unidade').forEach(el => { el.textContent = APP.unidade; });
+    document.querySelectorAll('.titulo-equipe').forEach(el => { el.textContent = (prefixo || 'Chamados de ') + APP.equipe; });
+  }
+  function seloStatus(s) { return '<span class="selo st-' + slug(s) + '">' + esc(s) + '</span>'; }
+  function seloPrioridade(p) { return '<span class="selo pr-' + slug(p) + '">' + esc(p) + '</span>'; }
+  function dataHora(ms) {
+    if (!ms) return '—';
+    const d = new Date(ms);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+  function tempoDesde(ms) {
+    if (!ms) return '—';
+    const min = Math.floor((Date.now() - ms) / 60000);
+    if (min < 1) return 'agora';
+    if (min < 60) return 'há ' + min + ' min';
+    const h = Math.floor(min / 60);
+    if (h < 24) return 'há ' + h + ' h';
+    const d = Math.floor(h / 24);
+    return 'há ' + d + (d === 1 ? ' dia' : ' dias');
+  }
+</script>
+
+  <script src="config.js"></script>
+  <style>
+    .estreito { max-width: 420px; }
+    .usuario { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .painel { max-width: 1200px; margin: 20px auto 40px; padding: 0 16px; }
+
+    .indicadores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+    .indicador { text-align: left; background: var(--superficie); border: 1px solid transparent; border-radius: var(--raio); box-shadow: var(--sombra); padding: 14px 16px; font: inherit; color: inherit; cursor: pointer; }
+    .indicador:hover { border-color: var(--azul); }
+    .indicador span { display: block; font-size: 13px; color: var(--texto-3); }
+    .indicador strong { display: block; font-size: 28px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    .indicador.alerta-urgente strong { color: var(--vermelho); }
+
+    .filtros { display: grid; grid-template-columns: repeat(3, minmax(130px, 170px)) 1fr auto; gap: 10px; align-items: end; margin-bottom: 12px; }
+    .filtros label { font-size: 12px; color: var(--texto-3); margin-bottom: 4px; }
+    .filtros select, .filtros input { padding: 8px 10px; }
+    .atualizado { font-size: 12px; color: var(--texto-3); text-align: right; margin-bottom: 8px; }
+
+    .lista { background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); overflow: hidden; }
+    .linha { display: grid; grid-template-columns: 120px 1fr 90px 130px 150px 90px; gap: 12px; align-items: center; padding: 12px 16px; }
+    .lista-cab { font-size: 12px; font-weight: 600; color: var(--texto-3); text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--borda); }
+    .item { width: 100%; border: 0; border-bottom: 1px solid var(--fundo); background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+    .item:hover { background: #f8fafc; }
+    .item:focus-visible { outline: 2px solid var(--azul); outline-offset: -2px; }
+    .item.urgente { box-shadow: inset 3px 0 0 var(--vermelho); }
+    .item-prot { font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .item-assunto { min-width: 0; }
+    .item-assunto strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item-assunto small { display: block; color: var(--texto-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .item-resp, .item-tempo { font-size: 13px; color: var(--texto-2); }
+    .item-resp em { color: var(--texto-3); }
+    .vazio { padding: 40px 16px; text-align: center; color: var(--texto-3); }
+
+    .fundo-gaveta { position: fixed; inset: 0; background: rgba(16, 24, 40, .45); z-index: 10; }
+    .gaveta { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--superficie); z-index: 11; display: flex; flex-direction: column; box-shadow: -8px 0 24px rgba(16, 24, 40, .15); }
+    .gaveta-cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--borda); }
+    .gaveta-corpo { padding: 20px; overflow-y: auto; flex: 1; }
+    .fechar { border: 0; background: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--texto-3); padding: 4px 8px; }
+    .dados { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 16px 0; padding: 14px; background: var(--fundo); border-radius: 8px; }
+    .dados dt { font-size: 12px; color: var(--texto-3); }
+    .dados dd { margin: 0; font-weight: 600; word-break: break-word; }
+    .bloco-texto { white-space: pre-wrap; word-break: break-word; margin-bottom: 16px; }
+    .solucao { background: var(--verde-claro); border-radius: 8px; padding: 12px; }
+    .acoes { border: 1px solid var(--borda); border-radius: var(--raio); padding: 16px; margin: 20px 0; }
+    .acoes .botoes { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .acoes textarea { min-height: 80px; }
+    .tag-interna { font-size: 11px; background: var(--fundo); border: 1px solid var(--borda); border-radius: 4px; padding: 0 5px; margin-left: 4px; }
+
+    @media (max-width: 900px) {
+      .indicadores { grid-template-columns: repeat(3, 1fr); }
+      .filtros { grid-template-columns: 1fr 1fr; }
+      .filtros .busca-campo { grid-column: 1 / -1; }
+      .lista-cab { display: none; }
+      .linha { grid-template-columns: 1fr auto; grid-template-areas: "prot tempo" "assunto assunto" "selos selos"; gap: 6px 12px; }
+      .item-prot { grid-area: prot; }
+      .item-tempo { grid-area: tempo; }
+      .item-assunto { grid-area: assunto; }
+      .item-selos { grid-area: selos; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+      .item-resp { font-size: 12px; }
+    }
+    @media (min-width: 901px) { .item-selos { display: contents; } }
+    @media (max-width: 520px) {
+      .indicadores { grid-template-columns: 1fr 1fr; }
+      .usuario span { display: none; }
+      .dados { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-conteudo">
+      <div class="marca"><small class="titulo-equipe"></small><strong class="unidade"></strong></div>
+      <div class="usuario oculto" id="barra-usuario">
+        <span id="nome-usuario"></span>
+        <button type="button" class="botao botao-claro" id="sair">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login -->
+  <section id="tela-login" class="container estreito">
+    <form id="form-login" class="cartao">
+      <h1 id="titulo-login"></h1>
+      <p class="sub">Entre com o usuário e a senha cadastrados pelo administrador.</p>
+      <div id="erro-login" class="alerta alerta-erro oculto" role="alert"></div>
+      <div class="campo">
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" autocomplete="username" autocapitalize="off">
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" autocomplete="current-password">
+      </div>
+      <button type="submit" id="entrar" class="botao botao-primario botao-bloco">Entrar</button>
+    </form>
+    <p class="rodape-links"><a id="link-abrir" href="#">Abrir um chamado</a></p>
+  </section>
+
+  <!-- Painel -->
+  <section id="tela-painel" class="painel oculto">
+    <div class="indicadores" id="indicadores"></div>
+
+    <div class="filtros">
+      <div>
+        <label for="f-status">Status</label>
+        <select id="f-status"></select>
+      </div>
+      <div>
+        <label for="f-prioridade">Prioridade</label>
+        <select id="f-prioridade"></select>
+      </div>
+      <div>
+        <label for="f-resp">Responsável</label>
+        <select id="f-resp">
+          <option value="">Todos</option>
+          <option value="meus">Meus chamados</option>
+          <option value="sem">Sem responsável</option>
+        </select>
+      </div>
+      <div class="busca-campo">
+        <label for="f-busca">Buscar</label>
+        <input type="search" id="f-busca" placeholder="Protocolo, assunto, setor, solicitante…">
+      </div>
+      <button type="button" class="botao botao-secundario" id="recarregar">Atualizar</button>
+    </div>
+    <div class="atualizado" id="atualizado"></div>
+
+    <div class="lista">
+      <div class="linha lista-cab">
+        <span>Protocolo</span><span>Assunto</span><span>Prioridade</span><span>Status</span><span>Responsável</span><span>Aberto</span>
+      </div>
+      <div id="lista"></div>
+    </div>
+  </section>
+
+  <!-- Detalhe do chamado -->
+  <div id="detalhe" class="oculto">
+    <div class="fundo-gaveta" id="fundo-gaveta"></div>
+    <aside class="gaveta" role="dialog" aria-modal="true" aria-labelledby="detalhe-titulo">
+      <div class="gaveta-cab">
+        <strong id="detalhe-titulo"></strong>
+        <button type="button" class="fechar" id="fechar" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="gaveta-corpo" id="detalhe-corpo"></div>
+    </aside>
+  </div>
+
+  <script type="text/plain" id="principal">
+    const APP = window.APP;
+    const $ = s => document.querySelector(s);
+    const FINAIS = ['Concluído', 'Cancelado'];
+    const PESO_PRIORIDADE = { 'Urgente': 0, 'Alta': 1, 'Média': 2, 'Baixa': 3 };
+    const CHAVE_SESSAO = 'chamados.sessao.' + APP.equipe; // TI e Manutenção podem estar no mesmo endereço
+    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null };
+
+    preencherCabecalho('Painel de ');
+    $('#titulo-login').textContent = 'Painel de ' + APP.equipe;
+    $('#link-abrir').href = link('abrir');
+
+    $('#f-status').innerHTML =
+      '<option value="abertos">Em aberto</option>' +
+      APP.status.map(s => '<option>' + esc(s) + '</option>').join('') +
+      '<option value="todos">Todos</option>';
+    $('#f-prioridade').innerHTML =
+      '<option value="">Todas</option><option value="altas">Alta e urgente</option>' +
+      APP.prioridades.slice().reverse().map(p => '<option>' + esc(p) + '</option>').join('');
+
+    // ---------- Sessão ----------
+
+    async function api(fn) {
+      const args = Array.prototype.slice.call(arguments, 1);
+      try {
+        return await chamar.apply(null, [fn, estado.sessao.token].concat(args));
+      } catch (e) {
+        if (/SESSAO_EXPIRADA/.test(mensagemErro(e))) {
+          encerrar('Sua sessão expirou. Entre novamente.');
+          throw new Error('Sessão expirada.');
+        }
+        throw e;
+      }
+    }
+
+    function iniciar(sessao) {
+      estado.sessao = sessao;
+      try { sessionStorage.setItem(CHAVE_SESSAO, JSON.stringify(sessao)); } catch (e) { /* sem armazenamento */ }
+      $('#nome-usuario').textContent = sessao.nome;
+      $('#barra-usuario').classList.remove('oculto');
+      $('#tela-login').classList.add('oculto');
+      $('#tela-painel').classList.remove('oculto');
+      carregar();
+      clearInterval(estado.timer);
+      estado.timer = setInterval(() => { if (!document.hidden) carregar(true); }, 60000);
+    }
+
+    function encerrar(aviso) {
+      if (estado.sessao && !aviso) chamar('sair', estado.sessao.token).catch(() => {});
+      estado.sessao = null;
+      clearInterval(estado.timer);
+      try { sessionStorage.removeItem(CHAVE_SESSAO); } catch (e) { /* sem armazenamento */ }
+      fecharDetalhe();
+      $('#barra-usuario').classList.add('oculto');
+      $('#tela-painel').classList.add('oculto');
+      $('#tela-login').classList.remove('oculto');
+      $('#senha').value = '';
+      const el = $('#erro-login');
+      el.textContent = aviso || '';
+      el.classList.toggle('oculto', !aviso);
+    }
+
+    $('#form-login').addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const botao = $('#entrar');
+      $('#erro-login').classList.add('oculto');
+      botao.disabled = true;
+      botao.innerHTML = '<span class="girando"></span> Entrando…';
+      try {
+        iniciar(await chamar('entrar', $('#usuario').value.trim(), $('#senha').value));
+        $('#senha').value = '';
+      } catch (e) {
+        $('#erro-login').textContent = mensagemErro(e);
+        $('#erro-login').classList.remove('oculto');
+      } finally {
+        botao.disabled = false;
+        botao.textContent = 'Entrar';
+      }
+    });
+    $('#sair').addEventListener('click', () => encerrar());
+
+    // ---------- Lista ----------
+
+    async function carregar(silencioso) {
+      if (!silencioso) $('#lista').innerHTML = '<div class="vazio"><span class="girando"></span> Carregando chamados…</div>';
+      try {
+        const r = await api('listarChamados');
+        estado.chamados = r.chamados;
+        estado.tecnicos = r.tecnicos;
+        $('#atualizado').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' · atualiza sozinho a cada minuto';
+        renderizar();
+      } catch (e) {
+        if (!silencioso && estado.sessao) $('#lista').innerHTML = '<div class="vazio">' + esc(mensagemErro(e)) + '</div>';
+      }
+    }
+
+    function normalizar(t) {
+      return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
+    function filtrar() {
+      const status = $('#f-status').value;
+      const prioridade = $('#f-prioridade').value;
+      const resp = $('#f-resp').value;
+      const busca = normalizar($('#f-busca').value.trim());
+      return estado.chamados.filter(c => {
+        if (status === 'abertos' && FINAIS.includes(c.status)) return false;
+        if (status !== 'abertos' && status !== 'todos' && c.status !== status) return false;
+        if (prioridade === 'altas' && !['Alta', 'Urgente'].includes(c.prioridade)) return false;
+        if (prioridade && prioridade !== 'altas' && c.prioridade !== prioridade) return false;
+        if (resp === 'meus' && c.responsavel !== estado.sessao.nome) return false;
+        if (resp === 'sem' && c.responsavel) return false;
+        if (busca && !normalizar([c.protocolo, c.assunto, c.setor, c.solicitante, c.categoria, c.responsavel].join(' ')).includes(busca)) return false;
+        return true;
+      }).sort((a, b) => {
+        const fa = FINAIS.includes(a.status), fb = FINAIS.includes(b.status);
+        if (fa !== fb) return fa ? 1 : -1;
+        if (fa) return b.atualizadoEm - a.atualizadoEm;
+        return (PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade]) || (a.abertoEm - b.abertoEm);
+      });
+    }
+
+    function renderizarIndicadores() {
+      const base = estado.chamados;
+      const conta = fn => base.filter(fn).length;
+      const urgentes = conta(c => !FINAIS.includes(c.status) && ['Alta', 'Urgente'].includes(c.prioridade));
+      const cards = [
+        ['Aberto', 'Abertos', conta(c => c.status === 'Aberto')],
+        ['Em atendimento', 'Em atendimento', conta(c => c.status === 'Em atendimento')],
+        ['Aguardando', 'Aguardando', conta(c => c.status === 'Aguardando')],
+        ['altas', 'Alta / urgente em aberto', urgentes],
+        ['Concluído', 'Concluídos (30 dias)', conta(c => c.status === 'Concluído')]
+      ];
+      $('#indicadores').innerHTML = cards.map(c =>
+        '<button type="button" class="indicador' + (c[0] === 'altas' && c[2] ? ' alerta-urgente' : '') + '" data-filtro="' + esc(c[0]) + '">' +
+        '<span>' + esc(c[1]) + '</span><strong>' + c[2] + '</strong></button>').join('');
+    }
+
+    function renderizar() {
+      renderizarIndicadores();
+      const lista = filtrar();
+      if (!lista.length) {
+        $('#lista').innerHTML = '<div class="vazio">Nenhum chamado com esses filtros.</div>';
+        return;
+      }
+      $('#lista').innerHTML = lista.map(c =>
+        '<button type="button" class="linha item' + (c.prioridade === 'Urgente' && !FINAIS.includes(c.status) ? ' urgente' : '') + '" data-protocolo="' + esc(c.protocolo) + '">' +
+          '<span class="item-prot">' + esc(c.protocolo) + '</span>' +
+          '<span class="item-assunto"><strong>' + esc(c.assunto) + '</strong>' +
+            '<small>' + esc(c.categoria) + ' · ' + esc(c.setor) + ' · ' + esc(c.solicitante) + '</small></span>' +
+          '<span class="item-selos">' +
+            '<span>' + seloPrioridade(c.prioridade) + '</span>' +
+            '<span>' + seloStatus(c.status) + '</span>' +
+            '<span class="item-resp">' + (c.responsavel ? esc(c.responsavel) : '<em>Sem responsável</em>') + '</span>' +
+          '</span>' +
+          '<span class="item-tempo" title="' + esc(dataHora(c.abertoEm)) + '">' + esc(tempoDesde(c.abertoEm)) + '</span>' +
+        '</button>').join('');
+    }
+
+    ['#f-status', '#f-prioridade', '#f-resp'].forEach(s => $(s).addEventListener('change', renderizar));
+    $('#f-busca').addEventListener('input', renderizar);
+    $('#recarregar').addEventListener('click', () => carregar());
+
+    $('#indicadores').addEventListener('click', ev => {
+      const card = ev.target.closest('.indicador');
+      if (!card) return;
+      const f = card.dataset.filtro;
+      $('#f-status').value = f === 'altas' ? 'abertos' : f;
+      $('#f-prioridade').value = f === 'altas' ? 'altas' : '';
+      renderizar();
+    });
+
+    $('#lista').addEventListener('click', ev => {
+      const item = ev.target.closest('.item');
+      if (item) abrirDetalhe(item.dataset.protocolo);
+    });
+
+    // ---------- Detalhe ----------
+
+    async function abrirDetalhe(protocolo) {
+      $('#detalhe-titulo').textContent = protocolo;
+      $('#detalhe-corpo').innerHTML = '<div class="vazio"><span class="girando"></span> Carregando…</div>';
+      $('#detalhe').classList.remove('oculto');
+      document.body.style.overflow = 'hidden';
+      try {
+        mostrarDetalhe(await api('detalharChamado', protocolo));
+      } catch (e) {
+        $('#detalhe-corpo').innerHTML = '<div class="alerta alerta-erro">' + esc(mensagemErro(e)) + '</div>';
+      }
+    }
+
+    function fecharDetalhe() {
+      estado.atual = null;
+      $('#detalhe').classList.add('oculto');
+      document.body.style.overflow = '';
+    }
+
+    function mostrarDetalhe(d) {
+      estado.atual = d;
+      const i = estado.chamados.findIndex(c => c.protocolo === d.protocolo);
+      if (i >= 0) estado.chamados[i] = Object.assign(estado.chamados[i], d);
+      renderizar();
+
+      const final = FINAIS.includes(d.status);
+      const souResponsavel = d.responsavel === estado.sessao.nome;
+      const tecnicos = estado.tecnicos.slice();
+      if (d.responsavel && !tecnicos.includes(d.responsavel)) tecnicos.push(d.responsavel);
+
+      const historico = d.historico.slice().reverse().map(h =>
+        '<li class="' + (h.publico ? '' : 'interna') + '">' +
+          '<div class="lt-meta">' + esc(dataHora(h.data)) + ' · ' + esc(h.autor) + ' · ' + esc(h.tipo) +
+          (h.publico ? '' : '<span class="tag-interna">interna</span>') + '</div>' +
+          '<div class="lt-texto">' + esc(h.mensagem) + '</div>' +
+        '</li>').join('');
+
+      const contato = [d.telefone, d.email].filter(Boolean).map(esc).join('<br>') || '—';
+
+      $('#detalhe-titulo').innerHTML = esc(d.protocolo) + ' &nbsp;' + seloStatus(d.status);
+      $('#detalhe-corpo').innerHTML =
+        '<h2 style="margin-bottom:4px">' + esc(d.assunto) + '</h2>' +
+        '<div>' + seloPrioridade(d.prioridade) + '</div>' +
+        '<dl class="dados">' +
+          '<div><dt>Categoria</dt><dd>' + esc(d.categoria) + '</dd></div>' +
+          '<div><dt>Setor / Local</dt><dd>' + esc(d.setor) + '</dd></div>' +
+          '<div><dt>Solicitante</dt><dd>' + esc(d.solicitante) + '</dd></div>' +
+          '<div><dt>Contato</dt><dd>' + contato + '</dd></div>' +
+          '<div><dt>Aberto em</dt><dd>' + esc(dataHora(d.abertoEm)) + ' (' + esc(tempoDesde(d.abertoEm)) + ')</dd></div>' +
+          '<div><dt>Responsável</dt><dd>' + (d.responsavel ? esc(d.responsavel) : '—') + '</dd></div>' +
+          (d.concluidoEm ? '<div><dt>Encerrado em</dt><dd>' + esc(dataHora(d.concluidoEm)) + '</dd></div>' : '') +
+        '</dl>' +
+        '<h3>Descrição</h3><div class="bloco-texto">' + esc(d.descricao) + '</div>' +
+        (d.anexo ? '<p><a href="' + esc(d.anexo) + '" target="_blank" rel="noopener">Ver anexo ↗</a></p>' : '') +
+        (d.solucao ? '<h3>Solução</h3><div class="bloco-texto solucao">' + esc(d.solucao) + '</div>' : '') +
+
+        '<form class="acoes" id="form-acao">' +
+          '<h3>Atualizar chamado</h3>' +
+          '<div id="erro-acao" class="alerta alerta-erro oculto" role="alert"></div>' +
+          '<div class="grade-2">' +
+            '<div class="campo"><label for="a-status">Status</label><select id="a-status">' +
+              APP.status.map(s => '<option' + (s === d.status ? ' selected' : '') + '>' + esc(s) + '</option>').join('') +
+            '</select></div>' +
+            '<div class="campo"><label for="a-resp">Responsável</label><select id="a-resp">' +
+              '<option value="">— Sem responsável —</option>' +
+              tecnicos.map(t => '<option' + (t === d.responsavel ? ' selected' : '') + '>' + esc(t) + '</option>').join('') +
+            '</select></div>' +
+          '</div>' +
+          '<div class="campo oculto" id="campo-solucao"><label for="a-solucao">Solução aplicada <span class="obrig">*</span></label>' +
+            '<textarea id="a-solucao" placeholder="O que foi feito para resolver.">' + esc(d.solucao) + '</textarea></div>' +
+          '<div class="campo"><label for="a-msg">Comentário</label>' +
+            '<textarea id="a-msg" placeholder="Ex.: peça solicitada, previsão de visita amanhã às 10h."></textarea>' +
+            '<label class="check"><input type="checkbox" id="a-publico"> <span>Mostrar ao solicitante <span class="dica">(aparece na consulta do protocolo e vai por e-mail, se ele informou)</span></span></label>' +
+          '</div>' +
+          '<div class="botoes">' +
+            (!final && !souResponsavel ? '<button type="button" class="botao botao-secundario" id="assumir">Assumir chamado</button>' : '') +
+            '<button type="submit" class="botao botao-primario" id="salvar">Salvar</button>' +
+          '</div>' +
+        '</form>' +
+
+        '<h3>Histórico</h3><ul class="linha-tempo">' + historico + '</ul>';
+
+      const atualizarCampoSolucao = () =>
+        $('#campo-solucao').classList.toggle('oculto', $('#a-status').value !== 'Concluído' && !d.solucao);
+      $('#a-status').addEventListener('change', atualizarCampoSolucao);
+      atualizarCampoSolucao();
+
+      $('#form-acao').addEventListener('submit', ev => {
+        ev.preventDefault();
+        const status = $('#a-status').value;
+        const alt = {
+          status: status,
+          responsavel: $('#a-resp').value,
+          mensagem: $('#a-msg').value.trim(),
+          publico: $('#a-publico').checked
+        };
+        if (!$('#campo-solucao').classList.contains('oculto')) alt.solucao = $('#a-solucao').value.trim();
+        if (status === 'Concluído' && !alt.solucao) return erroAcao('Descreva a solução para concluir o chamado.');
+        salvar(d.protocolo, alt, $('#salvar'));
+      });
+
+      const assumir = $('#assumir');
+      if (assumir) assumir.addEventListener('click', () => salvar(d.protocolo, {
+        responsavel: estado.sessao.nome,
+        status: d.status === 'Aberto' ? 'Em atendimento' : d.status
+      }, assumir));
+    }
+
+    function erroAcao(msg) {
+      const el = $('#erro-acao');
+      el.textContent = msg;
+      el.classList.remove('oculto');
+    }
+
+    async function salvar(protocolo, alt, botao) {
+      const texto = botao.textContent;
+      botao.disabled = true;
+      botao.innerHTML = '<span class="girando"></span> Salvando…';
+      try {
+        mostrarDetalhe(await api('atualizarChamado', protocolo, alt));
+      } catch (e) {
+        erroAcao(mensagemErro(e));
+        botao.disabled = false;
+        botao.textContent = texto;
+      }
+    }
+
+    $('#fechar').addEventListener('click', fecharDetalhe);
+    $('#fundo-gaveta').addEventListener('click', fecharDetalhe);
+    document.addEventListener('keydown', ev => { if (ev.key === 'Escape' && estado.atual) fecharDetalhe(); });
+
+    // Mantém o técnico logado ao recarregar a página (até a sessão expirar no servidor)
+    try {
+      const salva = JSON.parse(sessionStorage.getItem(CHAVE_SESSAO));
+      if (salva && salva.token) iniciar(salva);
+    } catch (e) { /* sem sessão salva */ }
+  </script>
+  <script>
+    // Busca no Google os dados da tela (equipe, categorias...) e só então roda o script da página
+    (async function () {
+      const q = new URLSearchParams(location.search);
+      const chave = q.get('equipe');
+      const equipe = CHAMADOS.equipes[chave];
+      if (!equipe) { location.replace('index.html'); return; }
+      try {
+        const app = await chamarApi(equipe.api, 'dadosTela', ['painel']);
+        window.APP = Object.assign(app, { api: equipe.api, chave: chave, protocolo: q.get('protocolo') || '' });
+        document.title = 'Chamados de ' + app.equipe + ' — ' + app.unidade;
+        const s = document.createElement('script');
+        s.textContent = document.getElementById('principal').textContent;
+        document.body.appendChild(s);
+      } catch (e) {
+        document.body.insertAdjacentHTML('beforeend',
+          '<div class="container"><div class="alerta alerta-erro">Não foi possível carregar o sistema de chamados: ' +
+          esc(mensagemErro(e)) + '</div></div>');
+      }
+    })();
+  </script>
+</body>
+</html>
