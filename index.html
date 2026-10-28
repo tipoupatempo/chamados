@@ -250,8 +250,15 @@
     .equipe strong { font-size: 20px; }
     .equipe span { color: var(--texto-3); }
     .equipe em { margin-top: 8px; font-style: normal; font-weight: 600; color: var(--link); }
-    .atalhos { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 18px; margin: 24px 0 40px; font-size: 14px; color: var(--texto-3); }
-    @media (max-width: 600px) { .equipes { grid-template-columns: 1fr; } }
+    .bloco { margin-top: 20px; }
+    .bloco h2 { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .bloco .sub { margin-bottom: 14px; }
+    .bloco-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bloco-botoes .botao { padding: 12px 16px; }
+    .tecnicos { border-left: 4px solid var(--azul); }
+    @media (max-width: 600px) {
+      .equipes, .bloco-botoes { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -284,12 +291,30 @@
       </a>
     </div>
 
-    <div class="atalhos">
-      <a href="consulta.html?equipe=ti">Acompanhar chamado de TI</a>
-      <a href="consulta.html?equipe=manutencao">Acompanhar chamado de Manutenção</a>
-      <a href="painel.html?equipe=ti">Painel TI</a>
-      <a href="painel.html?equipe=manutencao">Painel Manutenção</a>
-    </div>
+    <section class="cartao bloco">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Já abriu um chamado?
+      </h2>
+      <p class="sub">Acompanhe o andamento com o número do protocolo.</p>
+      <div class="bloco-botoes">
+        <a class="botao botao-secundario" href="consulta.html?equipe=ti">Acompanhar chamado de TI</a>
+        <a class="botao botao-secundario" href="consulta.html?equipe=manutencao">Acompanhar chamado de Manutenção</a>
+      </div>
+    </section>
+
+    <section class="cartao bloco tecnicos">
+      <h2>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Área dos técnicos
+      </h2>
+      <p class="sub">Acesso à fila de chamados com usuário e senha.</p>
+      <div class="bloco-botoes">
+        <a class="botao botao-primario" href="painel.html?equipe=ti">Entrar no painel de TI</a>
+        <a class="botao botao-primario" href="painel.html?equipe=manutencao">Entrar no painel de Manutenção</a>
+      </div>
+    </section>
+    <div style="height: 40px"></div>
   </main>
 
   <script>
