@@ -4,7 +4,7 @@ const CHAMADOS = {
   equipes: {
     ti: {
       nome: 'TI',
-      descricao: 'Computador, impressora, internet, sistemas, e-mail, ramal',
+      descricao: 'SISS Online, impressora, internet, computador, ramal, totem, intranet',
       api: 'https://script.google.com/macros/s/AKfycbxY-xmofCi-qDzwMk5IZnI9DdvYMLTrU4AihlTg4cCjA-rPdhtpAk_Gbq7CYbEyRS7x/exec'
     },
     manutencao: {
