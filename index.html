@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Central de Chamados — Poupatempo da Saúde</title>
+  <style>
+  :root {
+    --azul: #0b5cad; --azul-escuro: #083f78; --azul-claro: #e8f1fb;
+    --verde: #1a7f4b; --verde-claro: #e3f4ea;
+    --laranja: #a65300; --laranja-claro: #fdf0e1;
+    --vermelho: #b42318; --vermelho-claro: #fdecea;
+    --roxo: #6941c6; --roxo-claro: #f1ecfb;
+    --texto: #1d2330; --texto-2: #4a5263; --texto-3: #6b7385;
+    --borda: #d5d9e0; --fundo: #f3f5f8; --superficie: #ffffff;
+    --raio: 10px;
+    --sombra: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .10);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px; line-height: 1.45;
+  }
+  a { color: var(--azul); }
+
+  .topo { background: var(--azul); color: #fff; padding: 12px 16px; }
+  .topo-conteudo { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .marca { display: flex; flex-direction: column; line-height: 1.2; }
+  .marca small { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .marca strong { font-size: 18px; }
+
+  .container { max-width: 760px; margin: 24px auto; padding: 0 16px; }
+  .cartao { background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); padding: 24px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  h3 { font-size: 15px; margin: 0 0 10px; }
+  .sub { color: var(--texto-3); margin: 0 0 20px; }
+
+  .campo { margin-bottom: 16px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  .obrig { color: var(--vermelho); }
+  .dica { font-weight: 400; color: var(--texto-3); font-size: 13px; }
+  input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 8px;
+    font: inherit; color: inherit; background: #fff;
+  }
+  textarea { min-height: 110px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--azul); outline-offset: -1px; border-color: var(--azul); }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-weight: 400; margin-top: 8px; cursor: pointer; }
+  .check input { margin-top: 3px; }
+  .grade-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+
+  .botao {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px; border-radius: 8px; border: 1px solid transparent;
+    font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap;
+  }
+  .botao-primario { background: var(--azul); color: #fff; }
+  .botao-primario:hover { background: var(--azul-escuro); }
+  .botao-secundario { background: #fff; color: var(--texto); border-color: var(--borda); }
+  .botao-secundario:hover { background: var(--fundo); }
+  .botao-claro { background: rgba(255, 255, 255, .15); color: #fff; border-color: rgba(255, 255, 255, .35); padding: 7px 14px; }
+  .botao-claro:hover { background: rgba(255, 255, 255, .25); }
+  .botao[disabled] { opacity: .6; cursor: wait; }
+  .botao-bloco { width: 100%; padding: 13px; font-size: 16px; }
+
+  .alerta { padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+  .alerta-erro { background: var(--vermelho-claro); color: var(--vermelho); }
+  .alerta-info { background: var(--azul-claro); color: var(--azul-escuro); }
+
+  .selo { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .st-aberto { background: var(--azul-claro); color: var(--azul); }
+  .st-em-atendimento { background: var(--laranja-claro); color: var(--laranja); }
+  .st-aguardando { background: var(--roxo-claro); color: var(--roxo); }
+  .st-concluido { background: var(--verde-claro); color: var(--verde); }
+  .st-cancelado { background: var(--fundo); color: var(--texto-3); border: 1px solid var(--borda); }
+  .pr-urgente { background: var(--vermelho); color: #fff; }
+  .pr-alta { background: var(--vermelho-claro); color: var(--vermelho); }
+  .pr-media { background: var(--fundo); color: var(--texto-2); }
+  .pr-baixa { background: #fff; color: var(--texto-3); border: 1px solid var(--borda); }
+
+  .linha-tempo { list-style: none; margin: 0; padding: 0; }
+  .linha-tempo li { position: relative; padding: 0 0 16px 22px; }
+  .linha-tempo li::before { content: ""; position: absolute; left: 4px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--azul); }
+  .linha-tempo li::after { content: ""; position: absolute; left: 8px; top: 18px; bottom: 0; width: 1px; background: var(--borda); }
+  .linha-tempo li:last-child::after { display: none; }
+  .linha-tempo li.interna::before { background: var(--texto-3); }
+  .lt-meta { font-size: 12px; color: var(--texto-3); }
+  .lt-texto { white-space: pre-wrap; word-break: break-word; }
+
+  .rodape-links { text-align: center; margin: 20px 0 40px; font-size: 14px; color: var(--texto-3); }
+  .oculto { display: none !important; }
+  .girando { display: inline-block; width: 16px; height: 16px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: girar .7s linear infinite; vertical-align: -3px; }
+  @keyframes girar { to { transform: rotate(360deg); } }
+
+  @media (max-width: 600px) {
+    .grade-2 { grid-template-columns: 1fr; }
+    .cartao { padding: 18px; }
+    .container { margin-top: 16px; }
+  }
+</style>
+<script>
+  // Duas formas de rodar: dentro do Google (google.script.run) ou na intranet (APP.api, via fetch).
+  function chamar(fn) {
+    const args = Array.prototype.slice.call(arguments, 1);
+    if (APP.api) return chamarApi(APP.api, fn, args);
+    return new Promise((ok, falha) => {
+      const runner = google.script.run.withSuccessHandler(ok).withFailureHandler(falha);
+      runner[fn].apply(runner, args);
+    });
+  }
+  // Sem cookies: o login do Google no navegador não interfere (evita o erro de várias contas)
+  async function chamarApi(url, acao, args) {
+    let r;
+    try {
+      r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ acao: acao, args: args || [] }),
+        credentials: 'omit',
+        redirect: 'follow'
+      });
+    } catch (e) {
+      throw new Error('Sem conexão com o servidor. Verifique a internet e tente de novo.');
+    }
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro);
+    return j.dados;
+  }
+  // Endereço de outra tela do sistema
+  function link(pagina, protocolo) {
+    const extra = protocolo ? 'protocolo=' + encodeURIComponent(protocolo) : '';
+    if (APP.api) return pagina + '.html?equipe=' + APP.chave + (extra ? '&' + extra : '');
+    const q = [pagina === 'abrir' ? '' : 'p=' + pagina, extra].filter(Boolean).join('&');
+    return APP.urlBase + (q ? '?' + q : '');
+  }
+  function mensagemErro(e) {
+    return String((e && e.message) || e).replace(/^(Exception|Error|Erro):\s*/i, '');
+  }
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function slug(v) {
+    return String(v || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-');
+  }
+  function preencherCabecalho(prefixo) {
+    document.querySelectorAll('.unidade').forEach(el => { el.textContent = APP.unidade; });
+    document.querySelectorAll('.titulo-equipe').forEach(el => { el.textContent = (prefixo || 'Chamados de ') + APP.equipe; });
+  }
+  function seloStatus(s) { return '<span class="selo st-' + slug(s) + '">' + esc(s) + '</span>'; }
+  function seloPrioridade(p) { return '<span class="selo pr-' + slug(p) + '">' + esc(p) + '</span>'; }
+  function dataHora(ms) {
+    if (!ms) return '—';
+    const d = new Date(ms);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+  function tempoDesde(ms) {
+    if (!ms) return '—';
+    const min = Math.floor((Date.now() - ms) / 60000);
+    if (min < 1) return 'agora';
+    if (min < 60) return 'há ' + min + ' min';
+    const h = Math.floor(min / 60);
+    if (h < 24) return 'há ' + h + ' h';
+    const d = Math.floor(h / 24);
+    return 'há ' + d + (d === 1 ? ' dia' : ' dias');
+  }
+</script>
+
+  <script src="config.js"></script>
+  <style>
+    .equipes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    .equipe { display: flex; flex-direction: column; gap: 6px; padding: 22px; text-decoration: none; color: inherit; border: 2px solid transparent; }
+    .equipe:hover { border-color: var(--azul); }
+    .equipe-icone { width: 52px; height: 52px; border-radius: 12px; background: var(--azul); color: #fff; display: grid; place-items: center; margin-bottom: 6px; }
+    .equipe strong { font-size: 20px; }
+    .equipe span { color: var(--texto-3); }
+    .equipe em { margin-top: 8px; font-style: normal; font-weight: 600; color: var(--azul); }
+    .atalhos { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 18px; margin: 24px 0 40px; font-size: 14px; color: var(--texto-3); }
+    @media (max-width: 600px) { .equipes { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topo">
+    <div class="topo-conteudo">
+      <div class="marca"><small>Central de Chamados</small><strong>Poupatempo da Saúde</strong></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Precisa de ajuda?</h1>
+    <p class="sub">Escolha a equipe para abrir um chamado. Você recebe um número de protocolo para acompanhar.</p>
+
+    <div class="equipes">
+      <a class="cartao equipe" href="abrir.html?equipe=ti">
+        <span class="equipe-icone" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
+        </span>
+        <strong>TI</strong>
+        <span id="desc-ti"></span>
+        <em>Abrir chamado →</em>
+      </a>
+      <a class="cartao equipe" href="abrir.html?equipe=manutencao">
+        <span class="equipe-icone" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>
+        </span>
+        <strong>Manutenção</strong>
+        <span id="desc-manutencao"></span>
+        <em>Abrir chamado →</em>
+      </a>
+    </div>
+
+    <div class="atalhos">
+      <a href="consulta.html?equipe=ti">Acompanhar chamado de TI</a>
+      <a href="consulta.html?equipe=manutencao">Acompanhar chamado de Manutenção</a>
+      <a href="painel.html?equipe=ti">Painel TI</a>
+      <a href="painel.html?equipe=manutencao">Painel Manutenção</a>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('desc-ti').textContent = CHAMADOS.equipes.ti.descricao;
+    document.getElementById('desc-manutencao').textContent = CHAMADOS.equipes.manutencao.descricao;
+  </script>
+</body>
+</html>
