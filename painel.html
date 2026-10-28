@@ -4,27 +4,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
   <style>
+  /* Tema claro (padrão). --azul preenche botões e topo; --link é o azul para texto. */
   :root {
-    --azul: #0b5cad; --azul-escuro: #083f78; --azul-claro: #e8f1fb;
+    color-scheme: light;
+    --azul: #0b5cad; --azul-escuro: #083f78; --azul-claro: #e8f1fb; --link: #0b5cad;
     --verde: #1a7f4b; --verde-claro: #e3f4ea;
     --laranja: #a65300; --laranja-claro: #fdf0e1;
-    --vermelho: #b42318; --vermelho-claro: #fdecea;
+    --vermelho: #b42318; --vermelho-claro: #fdecea; --perigo: #b42318;
     --roxo: #6941c6; --roxo-claro: #f1ecfb;
     --texto: #1d2330; --texto-2: #4a5263; --texto-3: #6b7385;
-    --borda: #d5d9e0; --fundo: #f3f5f8; --superficie: #ffffff;
+    --borda: #d5d9e0; --fundo: #f3f5f8; --superficie: #ffffff; --campo: #ffffff; --hover: #f8fafc;
+    --topo: #0b5cad;
     --raio: 10px;
     --sombra: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .10);
   }
+  /* Tema escuro: escolhido no botão ou, sem escolha, seguindo o sistema */
+  :root[data-tema="escuro"] {
+    color-scheme: dark;
+    --azul: #2563c9; --azul-escuro: #1d4f9f; --azul-claro: #172a47; --link: #7cb4ff;
+    --verde: #5fd99a; --verde-claro: #143223;
+    --laranja: #f5b75a; --laranja-claro: #362712;
+    --vermelho: #ff8a80; --vermelho-claro: #3d1b1b; --perigo: #c62828;
+    --roxo: #c3b1ff; --roxo-claro: #2b2346;
+    --texto: #e7eaf0; --texto-2: #c3c9d4; --texto-3: #9aa3b4;
+    --borda: #343c4c; --fundo: #10141b; --superficie: #1a1f29; --campo: #12161e; --hover: #222937;
+    --topo: #13284a;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+      color-scheme: dark;
+      --azul: #2563c9; --azul-escuro: #1d4f9f; --azul-claro: #172a47; --link: #7cb4ff;
+      --verde: #5fd99a; --verde-claro: #143223;
+      --laranja: #f5b75a; --laranja-claro: #362712;
+      --vermelho: #ff8a80; --vermelho-claro: #3d1b1b; --perigo: #c62828;
+      --roxo: #c3b1ff; --roxo-claro: #2b2346;
+      --texto: #e7eaf0; --texto-2: #c3c9d4; --texto-3: #9aa3b4;
+      --borda: #343c4c; --fundo: #10141b; --superficie: #1a1f29; --campo: #12161e; --hover: #222937;
+      --topo: #13284a;
+      --sombra: 0 1px 2px rgba(0, 0, 0, .4);
+    }
+  }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0; background: var(--fundo); color: var(--texto);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     font-size: 15px; line-height: 1.45;
   }
-  a { color: var(--azul); }
+  a { color: var(--link); }
 
-  .topo { background: var(--azul); color: #fff; padding: 12px 16px; }
+  .topo { background: var(--topo); color: #fff; padding: 12px 16px; }
   .topo-conteudo { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .topo-acoes { display: flex; align-items: center; gap: 8px; }
+  .botao-tema { width: 38px; height: 38px; padding: 0; flex: none; }
   .marca { display: flex; flex-direction: column; line-height: 1.2; }
   .marca small { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
   .marca strong { font-size: 18px; }
@@ -42,7 +75,11 @@
   .dica { font-weight: 400; color: var(--texto-3); font-size: 13px; }
   input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea {
     width: 100%; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 8px;
-    font: inherit; color: inherit; background: #fff;
+    font: inherit; color: inherit; background: var(--campo);
+  }
+  /* 16px nos campos: evita o zoom automático do iPhone ao tocar no campo */
+  @media (max-width: 600px) {
+    input[type=text], input[type=email], input[type=tel], input[type=password], input[type=search], select, textarea { font-size: 16px; }
   }
   textarea { min-height: 110px; resize: vertical; }
   input:focus, select:focus, textarea:focus { outline: 2px solid var(--azul); outline-offset: -1px; border-color: var(--azul); }
@@ -57,7 +94,7 @@
   }
   .botao-primario { background: var(--azul); color: #fff; }
   .botao-primario:hover { background: var(--azul-escuro); }
-  .botao-secundario { background: #fff; color: var(--texto); border-color: var(--borda); }
+  .botao-secundario { background: var(--superficie); color: var(--texto); border-color: var(--borda); }
   .botao-secundario:hover { background: var(--fundo); }
   .botao-claro { background: rgba(255, 255, 255, .15); color: #fff; border-color: rgba(255, 255, 255, .35); padding: 7px 14px; }
   .botao-claro:hover { background: rgba(255, 255, 255, .25); }
@@ -66,18 +103,18 @@
 
   .alerta { padding: 12px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
   .alerta-erro { background: var(--vermelho-claro); color: var(--vermelho); }
-  .alerta-info { background: var(--azul-claro); color: var(--azul-escuro); }
+  .alerta-info { background: var(--azul-claro); color: var(--link); }
 
   .selo { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .st-aberto { background: var(--azul-claro); color: var(--azul); }
+  .st-aberto { background: var(--azul-claro); color: var(--link); }
   .st-em-atendimento { background: var(--laranja-claro); color: var(--laranja); }
   .st-aguardando { background: var(--roxo-claro); color: var(--roxo); }
   .st-concluido { background: var(--verde-claro); color: var(--verde); }
   .st-cancelado { background: var(--fundo); color: var(--texto-3); border: 1px solid var(--borda); }
-  .pr-urgente { background: var(--vermelho); color: #fff; }
+  .pr-urgente { background: var(--perigo); color: #fff; }
   .pr-alta { background: var(--vermelho-claro); color: var(--vermelho); }
   .pr-media { background: var(--fundo); color: var(--texto-2); }
-  .pr-baixa { background: #fff; color: var(--texto-3); border: 1px solid var(--borda); }
+  .pr-baixa { background: var(--superficie); color: var(--texto-3); border: 1px solid var(--borda); }
 
   .linha-tempo { list-style: none; margin: 0; padding: 0; }
   .linha-tempo li { position: relative; padding: 0 0 16px 22px; }
@@ -100,6 +137,43 @@
   }
 </style>
 <script>
+  // Tema: "escuro", "claro" ou nada (segue o sistema). Aplicado já no <head> para não piscar.
+  const CHAVE_TEMA = 'chamados.tema';
+  function temaSalvo() {
+    try { return localStorage.getItem(CHAVE_TEMA); } catch (e) { return null; }
+  }
+  function temaAtual() {
+    return document.documentElement.dataset.tema ||
+      (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro');
+  }
+  function aplicarTema(tema) {
+    if (tema) document.documentElement.dataset.tema = tema;
+    else delete document.documentElement.dataset.tema;
+    const botao = document.getElementById('botao-tema');
+    if (botao) {
+      const escuro = temaAtual() === 'escuro';
+      botao.textContent = escuro ? '☀️' : '🌙';
+      botao.title = botao.ariaLabel = escuro ? 'Usar tema claro' : 'Usar tema escuro';
+    }
+  }
+  aplicarTema(temaSalvo());
+  document.addEventListener('DOMContentLoaded', () => {
+    const topo = document.querySelector('.topo-conteudo');
+    if (!topo) return;
+    const botao = document.createElement('button');
+    botao.type = 'button';
+    botao.id = 'botao-tema';
+    botao.className = 'botao botao-claro botao-tema';
+    botao.addEventListener('click', () => {
+      const novo = temaAtual() === 'escuro' ? 'claro' : 'escuro';
+      try { localStorage.setItem(CHAVE_TEMA, novo); } catch (e) { /* sem armazenamento: vale só nesta página */ }
+      aplicarTema(novo);
+    });
+    // No painel o botão fica junto de "Trocar senha" e "Sair"
+    (topo.querySelector('.topo-acoes') || topo).appendChild(botao);
+    aplicarTema(temaSalvo());
+  });
+
   // Duas formas de rodar: dentro do Google (google.script.run) ou na intranet (APP.api, via fetch).
   function chamar(fn) {
     const args = Array.prototype.slice.call(arguments, 1);
@@ -188,9 +262,9 @@
     .linha { display: grid; grid-template-columns: 120px 1fr 90px 130px 150px 90px; gap: 12px; align-items: center; padding: 12px 16px; }
     .lista-cab { font-size: 12px; font-weight: 600; color: var(--texto-3); text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--borda); }
     .item { width: 100%; border: 0; border-bottom: 1px solid var(--fundo); background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
-    .item:hover { background: #f8fafc; }
+    .item:hover { background: var(--hover); }
     .item:focus-visible { outline: 2px solid var(--azul); outline-offset: -2px; }
-    .item.urgente { box-shadow: inset 3px 0 0 var(--vermelho); }
+    .item.urgente { box-shadow: inset 3px 0 0 var(--perigo); }
     .item-prot { font-weight: 600; font-size: 13px; font-variant-numeric: tabular-nums; }
     .item-assunto { min-width: 0; }
     .item-assunto strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -229,10 +303,19 @@
       .item-resp { font-size: 12px; }
     }
     @media (min-width: 901px) { .item-selos { display: contents; } }
+    .texto-curto { display: none; }
     @media (max-width: 520px) {
       .indicadores { grid-template-columns: 1fr 1fr; }
-      .usuario span { display: none; }
+      .indicador { padding: 12px; }
+      .indicador strong { font-size: 24px; }
+      #nome-usuario { display: none; }
+      .usuario { gap: 6px; }
+      .usuario .botao-claro { padding: 7px 10px; }
+      .texto-longo { display: none; }
+      .texto-curto { display: inline; }
       .dados { grid-template-columns: 1fr; }
+      .gaveta-corpo { padding: 16px; }
+      .acoes .botoes .botao { flex: 1; }
     }
   </style>
 </head>
@@ -240,10 +323,12 @@
   <header class="topo">
     <div class="topo-conteudo">
       <div class="marca"><small class="titulo-equipe"></small><strong class="unidade"></strong></div>
-      <div class="usuario oculto" id="barra-usuario">
-        <span id="nome-usuario"></span>
-        <button type="button" class="botao botao-claro" id="abrir-troca">Trocar senha</button>
-        <button type="button" class="botao botao-claro" id="sair">Sair</button>
+      <div class="topo-acoes">
+        <div class="usuario oculto" id="barra-usuario">
+          <span id="nome-usuario"></span>
+          <button type="button" class="botao botao-claro" id="abrir-troca"><span class="texto-longo">Trocar senha</span><span class="texto-curto">Senha</span></button>
+          <button type="button" class="botao botao-claro" id="sair">Sair</button>
+        </div>
       </div>
     </div>
   </header>
