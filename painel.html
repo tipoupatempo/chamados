@@ -303,7 +303,12 @@
       .item-resp { font-size: 12px; }
     }
     @media (min-width: 901px) { .item-selos { display: contents; } }
+    .filtros-botoes { display: flex; gap: 8px; }
     .texto-curto { display: none; }
+    @media (max-width: 900px) {
+      .filtros-botoes { grid-column: 1 / -1; }
+      .filtros-botoes .botao { flex: 1; }
+    }
     @media (max-width: 520px) {
       .indicadores { grid-template-columns: 1fr 1fr; }
       .indicador { padding: 12px; }
@@ -377,7 +382,10 @@
         <label for="f-busca">Buscar</label>
         <input type="search" id="f-busca" placeholder="Protocolo, assunto, setor, solicitante…">
       </div>
-      <button type="button" class="botao botao-secundario" id="recarregar">Atualizar</button>
+      <div class="filtros-botoes">
+        <button type="button" class="botao botao-secundario" id="notificar">🔔 Ativar notificações</button>
+        <button type="button" class="botao botao-secundario" id="recarregar">Atualizar</button>
+      </div>
     </div>
     <div class="atualizado" id="atualizado"></div>
 
@@ -434,7 +442,7 @@
     const PESO_PRIORIDADE = { 'Urgente': 0, 'Alta': 1, 'Média': 2, 'Baixa': 3 };
     const CHAVE_SESSAO = 'chamados.sessao.' + APP.equipe; // TI e Manutenção podem estar no mesmo endereço
     // senhaLogin: só em memória, para não pedir a senha provisória de novo na troca obrigatória
-    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null, senhaLogin: null, trocaObrigatoria: false };
+    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null, senhaLogin: null, trocaObrigatoria: false, conhecidos: null };
 
     preencherCabecalho('Painel de ');
     $('#titulo-login').textContent = 'Painel de ' + APP.equipe;
@@ -485,13 +493,16 @@
     function liberarPainel() {
       carregar();
       clearInterval(estado.timer);
-      estado.timer = setInterval(() => { if (!document.hidden) carregar(true); }, 60000);
+      // Continua atualizando com a aba em segundo plano, para as notificações chegarem
+      estado.timer = setInterval(() => carregar(true), 60000);
     }
 
     function encerrar(aviso) {
       if (estado.sessao && !aviso) chamar('sair', estado.sessao.token).catch(() => {});
       estado.sessao = null;
       estado.senhaLogin = null;
+      estado.conhecidos = null;
+      document.title = TITULO_BASE;
       clearInterval(estado.timer);
       try { sessionStorage.removeItem(CHAVE_SESSAO); } catch (e) { /* sem armazenamento */ }
       fecharTroca();
@@ -599,11 +610,90 @@
         estado.chamados = r.chamados;
         estado.tecnicos = r.tecnicos;
         $('#atualizado').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + ' · atualiza sozinho a cada minuto';
+        avisarNovos(r.chamados);
         renderizar();
       } catch (e) {
         if (!silencioso && estado.sessao) $('#lista').innerHTML = '<div class="vazio">' + esc(mensagemErro(e)) + '</div>';
       }
     }
+
+    // ---------- Notificações na área de trabalho ----------
+
+    const TITULO_BASE = 'Chamados de ' + APP.equipe + ' — ' + APP.unidade;
+    const CHAVE_NOTIF = 'chamados.notificar.' + APP.equipe;
+
+    function notificacoesSuportadas() { return 'Notification' in window; }
+
+    function notificacoesLigadas() {
+      if (!notificacoesSuportadas() || Notification.permission !== 'granted') return false;
+      try { return localStorage.getItem(CHAVE_NOTIF) !== 'nao'; } catch (e) { return true; }
+    }
+
+    function atualizarBotaoNotif() {
+      const b = $('#notificar');
+      if (!notificacoesSuportadas()) { b.classList.add('oculto'); return; }
+      const bloqueadas = Notification.permission === 'denied';
+      b.textContent = bloqueadas ? '🔕 Notificações bloqueadas' : notificacoesLigadas() ? '🔔 Notificações ativas' : '🔔 Ativar notificações';
+      b.title = bloqueadas ? 'Libere no cadeado ao lado do endereço do site'
+        : notificacoesLigadas() ? 'Clique para desativar' : 'Avisar na área de trabalho quando chegar chamado novo';
+    }
+
+    $('#notificar').addEventListener('click', async () => {
+      if (!notificacoesSuportadas()) return;
+      if (Notification.permission === 'denied') {
+        $('#atualizado').textContent = 'As notificações estão bloqueadas neste navegador. Clique no cadeado ao lado do endereço do site e permita "Notificações".';
+        return;
+      }
+      let ligar = !notificacoesLigadas();
+      if (ligar && Notification.permission !== 'granted') ligar = (await Notification.requestPermission()) === 'granted';
+      try { localStorage.setItem(CHAVE_NOTIF, ligar ? 'sim' : 'nao'); } catch (e) { /* sem armazenamento */ }
+      if (ligar) {
+        bipe();
+        new Notification('Notificações ativadas', { body: 'Você será avisado quando chegar chamado novo de ' + APP.equipe + '.' });
+      }
+      atualizarBotaoNotif();
+    });
+
+    // Compara com a última atualização: o que apareceu como "Aberto" é chamado novo.
+    // Na primeira carga só memoriza, para não avisar a fila inteira ao entrar.
+    function avisarNovos(chamados) {
+      const abertos = chamados.filter(c => c.status === 'Aberto');
+      if (estado.conhecidos && notificacoesLigadas()) {
+        const novos = abertos.filter(c => !estado.conhecidos.has(c.protocolo));
+        novos.slice(0, 3).forEach(notificar);
+        if (novos.length > 3) new Notification('+' + (novos.length - 3) + ' chamados novos de ' + APP.equipe, { body: 'Abra o painel para ver todos.' });
+        if (novos.length) bipe();
+      }
+      estado.conhecidos = new Set(chamados.map(c => c.protocolo));
+      document.title = (abertos.length ? '(' + abertos.length + ') ' : '') + TITULO_BASE;
+    }
+
+    function notificar(c) {
+      const urgente = c.prioridade === 'Urgente';
+      const n = new Notification((urgente ? '🚨 URGENTE · ' : '') + 'Novo chamado ' + c.protocolo, {
+        body: c.assunto + '\n' + c.categoria + ' · ' + c.setor + ' · ' + c.solicitante,
+        tag: c.protocolo,
+        requireInteraction: urgente // urgente fica na tela até alguém clicar
+      });
+      n.onclick = () => { window.focus(); abrirDetalhe(c.protocolo); n.close(); };
+    }
+
+    function bipe() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const vol = ctx.createGain();
+        osc.frequency.value = 880;
+        vol.gain.setValueAtTime(0.15, ctx.currentTime);
+        vol.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.connect(vol).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+        setTimeout(() => ctx.close(), 600);
+      } catch (e) { /* navegador sem áudio */ }
+    }
+
+    atualizarBotaoNotif();
 
     function normalizar(t) {
       return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
