@@ -298,6 +298,7 @@
           seloStatus(c.status) + '</div>' +
           '<dl class="dados">' +
             '<div><dt>Categoria</dt><dd>' + esc(c.categoria) + '</dd></div>' +
+            (c.equipamento ? '<div><dt>Equipamento</dt><dd>' + esc(c.equipamento) + '</dd></div>' : '') +
             '<div><dt>Local</dt><dd>' + esc(c.setor) + '</dd></div>' +
             '<div><dt>Aberto em</dt><dd>' + esc(dataHora(c.abertoEm)) + '</dd></div>' +
             '<div><dt>Responsável</dt><dd>' + (c.responsavel ? esc(c.responsavel) : 'Aguardando técnico') + '</dd></div>' +
