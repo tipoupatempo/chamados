@@ -294,6 +294,12 @@
         <select id="categoria" name="categoria"></select>
       </div>
 
+      <div class="campo oculto" id="campo-equipamento">
+        <label for="equipamento"><span id="rotulo-equipamento"></span> <span class="obrig">*</span></label>
+        <input type="text" id="equipamento" name="equipamento" maxlength="80">
+        <div class="dica" style="margin-top:6px">Informe o número que aparece no equipamento ou o local exato, para o técnico ir direto nele.</div>
+      </div>
+
       <div class="campo">
         <label>Prioridade</label>
         <div class="prioridades" id="prioridades" role="radiogroup"></div>
@@ -360,6 +366,18 @@
     $('#lista-setores').innerHTML = APP.setores.map(s => '<option value="' + esc(s) + '">').join('');
     $('#categoria').innerHTML = '<option value="">Selecione…</option>' +
       APP.categorias.map(c => '<option>' + esc(c) + '</option>').join('');
+
+    // Painel e totem travados: pede o número/local do equipamento
+    function rotuloEquipamento() {
+      return (APP.equipamento || {})[$('#categoria').value] || '';
+    }
+    function atualizarEquipamento() {
+      const rotulo = rotuloEquipamento();
+      $('#campo-equipamento').classList.toggle('oculto', !rotulo);
+      $('#rotulo-equipamento').textContent = rotulo;
+      $('#equipamento').placeholder = /painel/i.test(rotulo) ? 'Ex.: Painel 3 – Recepção central' : 'Ex.: Totem 2 – Entrada principal';
+    }
+    $('#categoria').addEventListener('change', atualizarEquipamento);
     $('#prioridades').innerHTML = APP.prioridades.map(p =>
       '<label class="' + (p === 'Urgente' ? 'urgente' : '') + '"><input type="radio" name="prioridade" value="' + esc(p) + '"' +
       (p === 'Média' ? ' checked' : '') + '> ' + esc(p) + '</label>').join('');
@@ -436,6 +454,7 @@
         telefone: el.telefone.value.trim(),
         email: el.email.value.trim(),
         categoria: el.categoria.value,
+        equipamento: rotuloEquipamento() ? el.equipamento.value.trim() : '',
         prioridade: prioridade ? prioridade.value : 'Média',
         assunto: el.assunto.value.trim(),
         descricao: el.descricao.value.trim(),
@@ -446,6 +465,7 @@
       if (!dados.solicitante) faltando.push('nome');
       if (!dados.setor) faltando.push('setor / local');
       if (!dados.categoria) faltando.push('categoria');
+      if (rotuloEquipamento() && !dados.equipamento) faltando.push(rotuloEquipamento().toLowerCase());
       if (!dados.assunto) faltando.push('assunto');
       if (!dados.descricao) faltando.push('descrição');
       if (faltando.length) return mostrarErro('Preencha: ' + faltando.join(', ') + '.');
@@ -477,6 +497,7 @@
 
     $('#novo').addEventListener('click', () => {
       form.reset();
+      atualizarEquipamento();
       preencherMemoria();
       $('#sucesso').classList.add('oculto');
       form.classList.remove('oculto');

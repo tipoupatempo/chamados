@@ -748,7 +748,8 @@
         '<button type="button" class="linha item' + (c.prioridade === 'Urgente' && !FINAIS.includes(c.status) ? ' urgente' : '') + '" data-protocolo="' + esc(c.protocolo) + '">' +
           '<span class="item-prot">' + esc(c.protocolo) + '</span>' +
           '<span class="item-assunto"><strong>' + esc(c.assunto) + '</strong>' +
-            '<small>' + esc(c.categoria) + ' · ' + esc(c.setor) + ' · ' + esc(c.solicitante) + '</small></span>' +
+            '<small>' + esc(c.categoria) + (c.equipamento ? ' · <b>' + esc(c.equipamento) + '</b>' : '') +
+            ' · ' + esc(c.setor) + ' · ' + esc(c.solicitante) + '</small></span>' +
           '<span class="item-selos">' +
             '<span>' + seloPrioridade(c.prioridade) + '</span>' +
             '<span>' + seloStatus(c.status) + '</span>' +
@@ -822,6 +823,7 @@
         '<div>' + seloPrioridade(d.prioridade) + '</div>' +
         '<dl class="dados">' +
           '<div><dt>Categoria</dt><dd>' + esc(d.categoria) + '</dd></div>' +
+          (d.equipamento ? '<div><dt>Equipamento</dt><dd>' + esc(d.equipamento) + '</dd></div>' : '') +
           '<div><dt>Setor / Local</dt><dd>' + esc(d.setor) + '</dd></div>' +
           '<div><dt>Solicitante</dt><dd>' + esc(d.solicitante) + '</dd></div>' +
           '<div><dt>Contato</dt><dd>' + contato + '</dd></div>' +
