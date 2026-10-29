@@ -304,6 +304,8 @@
     }
     @media (min-width: 901px) { .item-selos { display: contents; } }
     .filtros-botoes { display: flex; gap: 8px; }
+    .grade-3 { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 600px) { .grade-3 { grid-template-columns: 1fr; } }
     .texto-curto { display: none; }
     @media (max-width: 900px) {
       .filtros-botoes { grid-column: 1 / -1; }
@@ -838,9 +840,12 @@
         '<form class="acoes" id="form-acao">' +
           '<h3>Atualizar chamado</h3>' +
           '<div id="erro-acao" class="alerta alerta-erro oculto" role="alert"></div>' +
-          '<div class="grade-2">' +
+          '<div class="grade-2 grade-3">' +
             '<div class="campo"><label for="a-status">Status</label><select id="a-status">' +
               APP.status.map(s => '<option' + (s === d.status ? ' selected' : '') + '>' + esc(s) + '</option>').join('') +
+            '</select></div>' +
+            '<div class="campo"><label for="a-prioridade">Prioridade</label><select id="a-prioridade">' +
+              APP.prioridades.map(p => '<option' + (p === d.prioridade ? ' selected' : '') + '>' + esc(p) + '</option>').join('') +
             '</select></div>' +
             '<div class="campo"><label for="a-resp">Responsável</label><select id="a-resp">' +
               '<option value="">— Sem responsável —</option>' +
@@ -851,7 +856,7 @@
             '<textarea id="a-solucao" placeholder="O que foi feito para resolver.">' + esc(d.solucao) + '</textarea></div>' +
           '<div class="campo"><label for="a-msg">Comentário</label>' +
             '<textarea id="a-msg" placeholder="Ex.: peça solicitada, previsão de visita amanhã às 10h."></textarea>' +
-            '<label class="check"><input type="checkbox" id="a-publico"> <span>Mostrar ao solicitante <span class="dica">(aparece na consulta do protocolo e vai por e-mail, se ele informou)</span></span></label>' +
+            '<label class="check"><input type="checkbox" id="a-publico"> <span>Mostrar ao solicitante <span class="dica">(aparece na consulta do protocolo)</span></span></label>' +
           '</div>' +
           '<div class="botoes">' +
             (!final && !souResponsavel ? '<button type="button" class="botao botao-secundario" id="assumir">Assumir chamado</button>' : '') +
@@ -871,6 +876,7 @@
         const status = $('#a-status').value;
         const alt = {
           status: status,
+          prioridade: $('#a-prioridade').value,
           responsavel: $('#a-resp').value,
           mensagem: $('#a-msg').value.trim(),
           publico: $('#a-publico').checked
