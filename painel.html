@@ -324,6 +324,67 @@
       .gaveta-corpo { padding: 16px; }
       .acoes .botoes .botao { flex: 1; }
     }
+
+    /* Abas Chamados / Dashboard */
+    .abas { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--borda); }
+    .aba { border: 0; border-bottom: 3px solid transparent; background: none; font: inherit; font-weight: 600; color: var(--texto-3); padding: 10px 16px; margin-bottom: -1px; cursor: pointer; }
+    .aba:hover { color: var(--texto); }
+    .aba[aria-selected="true"] { color: var(--link); border-bottom-color: var(--link); }
+
+    /* Dashboard */
+    :root { --dado-1: #0b5cad; --dado-2: #e07b00; }
+    :root[data-tema="escuro"] { --dado-1: #4a8fec; --dado-2: #d07f12; }
+    @media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) { --dado-1: #4a8fec; --dado-2: #d07f12; } }
+    .dash-filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 8px; }
+    .dash-filtros label { font-size: 12px; color: var(--texto-3); margin-bottom: 4px; }
+    .dash-filtros select, .dash-filtros input { padding: 8px 10px; width: auto; }
+    .dash-filtros input[type=date] { border: 1px solid var(--borda); border-radius: 8px; font: inherit; color: inherit; background: var(--campo); }
+    .dash-info { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--texto-3); margin-bottom: 12px; }
+    .dash-conteudo.recarregando { opacity: .6; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi { background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); padding: 14px 16px; }
+    .kpi span { display: block; font-size: 13px; color: var(--texto-3); }
+    .kpi strong { display: block; font-size: 28px; line-height: 1.2; }
+    .kpi small { display: block; font-size: 12px; color: var(--texto-3); }
+    .dash-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    .grafico { background: var(--superficie); border-radius: var(--raio); box-shadow: var(--sombra); padding: 16px 18px; min-width: 0; }
+    .grafico-largo { grid-column: 1 / -1; }
+    .grafico h3 { margin: 0; }
+    .grafico > p { font-size: 12px; color: var(--texto-3); margin: 2px 0 14px; }
+    .barras-h { display: grid; gap: 8px; }
+    .barra-h { display: grid; grid-template-columns: minmax(90px, 170px) 1fr 76px; gap: 10px; align-items: center; font-size: 13px; }
+    .barra-h-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .barra-h-trilho { min-width: 0; }
+    .barra-h-valor { height: 12px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--dado-1); }
+    .barra-h-num { text-align: right; color: var(--texto-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .barra-h-num b { color: var(--texto); }
+    .legenda { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; margin-bottom: 12px; }
+    .legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+    .evolucao { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+    .eixo-y { height: 200px; display: flex; flex-direction: column; justify-content: space-between; text-align: right; font-size: 12px; line-height: 0; color: var(--texto-3); font-variant-numeric: tabular-nums; }
+    .evolucao-rolagem { overflow-x: auto; padding: 0 10px; }
+    .evolucao-plot, .evolucao-x { display: flex; }
+    .evolucao-plot { position: relative; height: 200px; border-bottom: 1px solid var(--borda); }
+    .grade-linha { position: absolute; left: 0; right: 0; height: 1px; background: var(--fundo); }
+    .grupo { position: relative; flex: 1 1 0; min-width: 14px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 0 1px; }
+    .grupo:hover { background: var(--hover); }
+    .barra-v { flex: 0 1 14px; min-width: 2px; border-radius: 4px 4px 0 0; }
+    .evolucao-x span { flex: 1 1 0; min-width: 14px; height: 22px; padding-top: 6px; font-size: 11px; line-height: 1.2; color: var(--texto-3); text-align: center; white-space: nowrap; overflow: visible; display: flex; justify-content: center; }
+    .dica-grafico { position: fixed; z-index: 9; pointer-events: none; background: var(--texto); color: var(--superficie); border-radius: 6px; padding: 6px 10px; font-size: 12px; line-height: 1.4; white-space: nowrap; }
+    .ver-tabela { margin-top: 12px; font-size: 13px; }
+    .ver-tabela summary { cursor: pointer; color: var(--link); }
+    .ver-tabela table { border-collapse: collapse; margin-top: 8px; font-variant-numeric: tabular-nums; }
+    .ver-tabela th, .ver-tabela td { padding: 4px 16px 4px 0; border-bottom: 1px solid var(--fundo); text-align: right; }
+    .ver-tabela th:first-child, .ver-tabela td:first-child { text-align: left; }
+    @media (max-width: 900px) {
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .dash-grade { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .barra-h { grid-template-columns: 112px 1fr 62px; gap: 8px; }
+      .kpi { padding: 12px; }
+      .kpi strong { font-size: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -361,6 +422,40 @@
 
   <!-- Painel -->
   <section id="tela-painel" class="painel oculto">
+    <div class="abas" role="tablist">
+      <button type="button" class="aba" id="aba-chamados" role="tab" aria-selected="true" aria-controls="vista-chamados">Chamados</button>
+      <button type="button" class="aba" id="aba-dashboard" role="tab" aria-selected="false" aria-controls="vista-dashboard">Dashboard</button>
+    </div>
+
+    <div id="vista-dashboard" role="tabpanel" aria-labelledby="aba-dashboard" class="oculto">
+      <div class="dash-filtros">
+        <div>
+          <label for="d-periodo">Período</label>
+          <select id="d-periodo">
+            <option value="7">Últimos 7 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="mes">Este mês</option>
+            <option value="mes-passado">Mês passado</option>
+            <option value="ano">Este ano</option>
+            <option value="tudo">Tudo</option>
+            <option value="outro">Escolher datas…</option>
+          </select>
+        </div>
+        <div class="d-datas oculto">
+          <label for="d-de">De</label>
+          <input type="date" id="d-de">
+        </div>
+        <div class="d-datas oculto">
+          <label for="d-ate">Até</label>
+          <input type="date" id="d-ate">
+        </div>
+        <button type="button" class="botao botao-secundario" id="d-recarregar">Atualizar</button>
+      </div>
+      <div class="dash-info"><span id="d-rotulo"></span><span id="d-atualizado"></span></div>
+      <div id="d-conteudo" class="dash-conteudo"></div>
+    </div>
+
+    <div id="vista-chamados" role="tabpanel" aria-labelledby="aba-chamados">
     <div class="indicadores" id="indicadores"></div>
 
     <div class="filtros">
@@ -397,7 +492,10 @@
       </div>
       <div id="lista"></div>
     </div>
+    </div>
   </section>
+
+  <div id="dica-grafico" class="dica-grafico oculto" role="status"></div>
 
   <!-- Detalhe do chamado -->
   <div id="detalhe" class="oculto">
@@ -444,7 +542,7 @@
     const PESO_PRIORIDADE = { 'Urgente': 0, 'Alta': 1, 'Média': 2, 'Baixa': 3 };
     const CHAVE_SESSAO = 'chamados.sessao.' + APP.equipe; // TI e Manutenção podem estar no mesmo endereço
     // senhaLogin: só em memória, para não pedir a senha provisória de novo na troca obrigatória
-    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null, senhaLogin: null, trocaObrigatoria: false, conhecidos: null };
+    const estado = { sessao: null, chamados: [], tecnicos: [], atual: null, timer: null, senhaLogin: null, trocaObrigatoria: false, conhecidos: null, relatorio: null, relatorioEm: 0 };
 
     preencherCabecalho('Painel de ');
     $('#titulo-login').textContent = 'Painel de ' + APP.equipe;
@@ -504,6 +602,9 @@
       estado.sessao = null;
       estado.senhaLogin = null;
       estado.conhecidos = null;
+      estado.relatorio = null;
+      estado.relatorioEm = 0;
+      mostrarAba('chamados');
       document.title = TITULO_BASE;
       clearInterval(estado.timer);
       try { sessionStorage.removeItem(CHAVE_SESSAO); } catch (e) { /* sem armazenamento */ }
@@ -778,6 +879,248 @@
       const item = ev.target.closest('.item');
       if (item) abrirDetalhe(item.dataset.protocolo);
     });
+
+    // ---------- Abas ----------
+
+    function mostrarAba(nome) {
+      const dash = nome === 'dashboard';
+      $('#vista-chamados').classList.toggle('oculto', dash);
+      $('#vista-dashboard').classList.toggle('oculto', !dash);
+      $('#aba-chamados').setAttribute('aria-selected', String(!dash));
+      $('#aba-dashboard').setAttribute('aria-selected', String(dash));
+      if (dash && Date.now() - estado.relatorioEm > 60000) carregarRelatorio();
+    }
+    $('#aba-chamados').addEventListener('click', () => mostrarAba('chamados'));
+    $('#aba-dashboard').addEventListener('click', () => mostrarAba('dashboard'));
+
+    // ---------- Dashboard ----------
+
+    const DIA_MS = 864e5;
+    const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+    const LIMITE_LISTA = 10;
+
+    async function carregarRelatorio() {
+      const conteudo = $('#d-conteudo');
+      if (estado.relatorio) conteudo.classList.add('recarregando');
+      else conteudo.innerHTML = '<div class="vazio"><span class="girando"></span> Carregando números…</div>';
+      try {
+        const r = await api('relatorioChamados');
+        estado.relatorio = r.chamados;
+        estado.relatorioEm = Date.now();
+        $('#d-atualizado').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        renderizarDashboard();
+      } catch (e) {
+        if (!estado.relatorio && estado.sessao) conteudo.innerHTML = '<div class="vazio">' + esc(mensagemErro(e)) + '</div>';
+        else $('#d-atualizado').textContent = mensagemErro(e);
+      } finally {
+        conteudo.classList.remove('recarregando');
+      }
+    }
+
+    function dataDeCampo(valor) {
+      const p = String(valor).split('-').map(Number);
+      return p.length === 3 && p[0] ? new Date(p[0], p[1] - 1, p[2]) : null;
+    }
+    function dataParaCampo(d) {
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    }
+
+    // Intervalo escolhido: ini entra, fim não (começo do dia seguinte ao último)
+    function periodoEscolhido() {
+      const h = new Date();
+      const a = h.getFullYear(), m = h.getMonth(), d = h.getDate();
+      const amanha = new Date(a, m, d + 1);
+      switch ($('#d-periodo').value) {
+        case '7': return { ini: new Date(a, m, d - 6), fim: amanha };
+        case '30': return { ini: new Date(a, m, d - 29), fim: amanha };
+        case 'mes': return { ini: new Date(a, m, 1), fim: amanha };
+        case 'mes-passado': return { ini: new Date(a, m - 1, 1), fim: new Date(a, m, 1) };
+        case 'ano': return { ini: new Date(a, 0, 1), fim: amanha };
+        case 'tudo': {
+          const primeiro = estado.relatorio.reduce((min, c) => c.abertoEm && c.abertoEm < min ? c.abertoEm : min, Date.now());
+          const p = new Date(primeiro);
+          return { ini: new Date(p.getFullYear(), p.getMonth(), p.getDate()), fim: amanha };
+        }
+      }
+      const de = dataDeCampo($('#d-de').value) || new Date(a, m, d - 29);
+      const ate = dataDeCampo($('#d-ate').value) || new Date(a, m, d);
+      const menor = de <= ate ? de : ate, maior = de <= ate ? ate : de;
+      return { ini: menor, fim: new Date(maior.getFullYear(), maior.getMonth(), maior.getDate() + 1) };
+    }
+
+    function duracaoTexto(ms) {
+      const min = Math.round(ms / 60000);
+      if (min < 60) return min + ' min';
+      const h = Math.floor(min / 60);
+      if (h < 24) return h + ' h' + (min % 60 ? ' ' + (min % 60) + ' min' : '');
+      return Math.floor(h / 24) + ' d' + (h % 24 ? ' ' + (h % 24) + ' h' : '');
+    }
+
+    // Agrupa ignorando maiúsculas e acentos ("recepção" e "Recepção" são o mesmo setor)
+    function contarPor(lista, campo, vazio) {
+      const grupos = {};
+      lista.forEach(c => {
+        const nome = String(c[campo] || '').trim() || vazio;
+        if (!nome) return;
+        const chave = normalizar(nome);
+        if (!grupos[chave]) grupos[chave] = { nome: nome, n: 0 };
+        // Mostra a grafia com maiúscula, se alguém digitou assim
+        if (/^\p{Lu}/u.test(nome) && !/^\p{Lu}/u.test(grupos[chave].nome)) grupos[chave].nome = nome;
+        grupos[chave].n++;
+      });
+      return Object.keys(grupos).map(k => grupos[k]).sort((a, b) => b.n - a.n || a.nome.localeCompare(b.nome));
+    }
+
+    function nosLimites(itens, rotuloDemais) {
+      if (itens.length <= LIMITE_LISTA) return itens;
+      const resto = itens.slice(LIMITE_LISTA - 1);
+      return itens.slice(0, LIMITE_LISTA - 1).concat({
+        nome: rotuloDemais + ' (' + resto.length + ')',
+        n: resto.reduce((s, i) => s + i.n, 0)
+      });
+    }
+
+    function graficoBarras(titulo, nota, itens, total) {
+      const maior = Math.max.apply(null, itens.map(i => i.n).concat(1));
+      const linhas = itens.length ? itens.map(i => {
+        const pct = total ? Math.round(i.n / total * 100) : 0;
+        return '<div class="barra-h">' +
+          '<span class="barra-h-nome" title="' + esc(i.nome) + '">' + esc(i.nome) + '</span>' +
+          '<span class="barra-h-trilho">' + (i.n ? '<div class="barra-h-valor" style="width:' + (i.n / maior * 100) + '%"></div>' : '') + '</span>' +
+          '<span class="barra-h-num"><b>' + i.n + '</b> · ' + pct + '%</span>' +
+        '</div>';
+      }).join('') : '<div class="vazio" style="padding:16px">Nada neste período.</div>';
+      return '<section class="grafico"><h3>' + esc(titulo) + '</h3><p>' + esc(nota) + '</p><div class="barras-h">' + linhas + '</div></section>';
+    }
+
+    // Até dois meses, um grupo de barras por dia; acima disso, um por mês
+    function montarEvolucao(p, recebidos, concluidos) {
+      const porDia = (p.fim - p.ini) / DIA_MS <= 62;
+      const chave = ms => {
+        const d = new Date(ms);
+        return d.getFullYear() + '-' + d.getMonth() + (porDia ? '-' + d.getDate() : '');
+      };
+      const grupos = [], indice = {};
+      let d = porDia ? new Date(p.ini) : new Date(p.ini.getFullYear(), p.ini.getMonth(), 1);
+      while (d < p.fim) {
+        const g = {
+          rotulo: porDia ? ('0' + d.getDate()).slice(-2) + '/' + ('0' + (d.getMonth() + 1)).slice(-2)
+            : MESES[d.getMonth()] + '/' + String(d.getFullYear()).slice(-2),
+          recebidos: 0, concluidos: 0
+        };
+        indice[chave(d.getTime())] = g;
+        grupos.push(g);
+        d = porDia ? new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1) : new Date(d.getFullYear(), d.getMonth() + 1, 1);
+      }
+      recebidos.forEach(c => { const g = indice[chave(c.abertoEm)]; if (g) g.recebidos++; });
+      concluidos.forEach(c => { const g = indice[chave(c.concluidoEm)]; if (g) g.concluidos++; });
+      return { grupos: grupos, porDia: porDia };
+    }
+
+    function graficoEvolucao(p, recebidos, concluidos) {
+      const ev = montarEvolucao(p, recebidos, concluidos);
+      const grupos = ev.grupos;
+      const pico = Math.max.apply(null, grupos.map(g => Math.max(g.recebidos, g.concluidos)).concat(1));
+      // Topo do eixo sempre par, para a marca do meio ser um número inteiro
+      const topo = [2, 4, 6, 8, 10, 20, 30, 40, 50, 100, 200, 500, 1000].find(v => v >= pico) || Math.ceil(pico / 1000) * 1000;
+      const passo = grupos.length <= 12 ? 1 : Math.ceil(grupos.length / 8);
+      const altura = v => v ? 'height:' + (v / topo * 100) + '%;min-height:2px' : 'display:none';
+
+      const barras = grupos.map(g =>
+        '<div class="grupo" data-dica="' + esc('<b>' + g.rotulo + '</b><br>Recebidos: ' + g.recebidos + '<br>Concluídos: ' + g.concluidos) + '">' +
+          '<div class="barra-v" style="background:var(--dado-1);' + altura(g.recebidos) + '"></div>' +
+          '<div class="barra-v" style="background:var(--dado-2);' + altura(g.concluidos) + '"></div>' +
+        '</div>').join('');
+      const rotulos = grupos.map((g, i) => '<span>' + (i % passo === 0 ? esc(g.rotulo) : '') + '</span>').join('');
+      const linhasTabela = grupos.map(g =>
+        '<tr><td>' + esc(g.rotulo) + '</td><td>' + g.recebidos + '</td><td>' + g.concluidos + '</td></tr>').join('');
+
+      return '<section class="grafico grafico-largo">' +
+        '<h3>Recebidos e concluídos ' + (ev.porDia ? 'por dia' : 'por mês') + '</h3>' +
+        '<p>Passe o mouse (ou toque) nas barras para ver os números.</p>' +
+        '<div class="legenda">' +
+          '<span><i style="background:var(--dado-1)"></i>Recebidos: <b>' + recebidos.length + '</b></span>' +
+          '<span><i style="background:var(--dado-2)"></i>Concluídos: <b>' + concluidos.length + '</b></span>' +
+        '</div>' +
+        '<div class="evolucao">' +
+          '<div class="eixo-y"><span>' + topo + '</span><span>' + (topo / 2) + '</span><span>0</span></div>' +
+          '<div class="evolucao-rolagem">' +
+            '<div class="evolucao-plot" style="min-width:' + (grupos.length * 14) + 'px">' +
+              '<div class="grade-linha" style="top:0"></div><div class="grade-linha" style="top:50%"></div>' + barras +
+            '</div>' +
+            '<div class="evolucao-x" style="min-width:' + (grupos.length * 14) + 'px">' + rotulos + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<details class="ver-tabela"><summary>Ver em tabela</summary>' +
+          '<table><thead><tr><th>' + (ev.porDia ? 'Dia' : 'Mês') + '</th><th>Recebidos</th><th>Concluídos</th></tr></thead>' +
+          '<tbody>' + linhasTabela + '</tbody></table>' +
+        '</details>' +
+      '</section>';
+    }
+
+    function renderizarDashboard() {
+      if (!estado.relatorio) return;
+      const p = periodoEscolhido();
+      const dentro = ms => ms && ms >= p.ini.getTime() && ms < p.fim.getTime();
+      const todos = estado.relatorio;
+      const recebidos = todos.filter(c => dentro(c.abertoEm));
+      const concluidos = todos.filter(c => c.status === 'Concluído' && dentro(c.concluidoEm));
+      const emAberto = todos.filter(c => !FINAIS.includes(c.status)).length;
+      const comTempo = concluidos.filter(c => c.abertoEm && c.concluidoEm >= c.abertoEm);
+      const tempoMedio = comTempo.length ? comTempo.reduce((s, c) => s + c.concluidoEm - c.abertoEm, 0) / comTempo.length : null;
+
+      const ultimoDia = new Date(p.fim.getTime() - DIA_MS / 2);
+      $('#d-rotulo').textContent = p.ini.toLocaleDateString('pt-BR') + ' a ' + ultimoDia.toLocaleDateString('pt-BR');
+
+      const kpi = (nome, valor, nota) => '<div class="kpi"><span>' + esc(nome) + '</span><strong>' + esc(valor) + '</strong><small>' + esc(nota) + '</small></div>';
+      const fixos = (lista, valores) => valores.map(v => ({ nome: v, n: lista.filter(c => c.status === v || c.prioridade === v).length }));
+      const total = recebidos.length;
+      const equipamentos = contarPor(recebidos, 'equipamento');
+
+      $('#d-conteudo').innerHTML =
+        '<div class="kpis">' +
+          kpi('Recebidos', total, 'abertos no período') +
+          kpi('Concluídos', concluidos.length, 'encerrados no período') +
+          kpi('Em aberto agora', emAberto, 'fila atual, de qualquer data') +
+          kpi('Tempo médio de solução', tempoMedio === null ? '—' : duracaoTexto(tempoMedio), 'da abertura à conclusão, em horas corridas') +
+        '</div>' +
+        '<div class="dash-grade">' +
+          graficoEvolucao(p, recebidos, concluidos) +
+          graficoBarras('Por tipo de problema', 'Chamados recebidos no período', contarPor(recebidos, 'categoria'), total) +
+          graficoBarras('Por setor / local', 'Chamados recebidos no período', nosLimites(contarPor(recebidos, 'setor', 'Não informado'), 'Demais setores'), total) +
+          (equipamentos.length ? graficoBarras('Equipamentos com mais chamados', 'Painéis e totens informados nos chamados do período',
+            nosLimites(equipamentos, 'Demais equipamentos'), equipamentos.reduce((s, i) => s + i.n, 0)) : '') +
+          graficoBarras('Concluídos por técnico', 'Encerrados no período, pelo responsável do chamado', contarPor(concluidos, 'responsavel', 'Sem responsável'), concluidos.length) +
+          graficoBarras('Situação atual', 'Status de hoje dos chamados recebidos no período', fixos(recebidos, APP.status), total) +
+          graficoBarras('Por prioridade', 'Chamados recebidos no período', fixos(recebidos, APP.prioridades.slice().reverse()), total) +
+        '</div>';
+    }
+
+    $('#d-periodo').addEventListener('change', () => {
+      const outro = $('#d-periodo').value === 'outro';
+      document.querySelectorAll('.d-datas').forEach(el => el.classList.toggle('oculto', !outro));
+      if (outro && !$('#d-de').value) {
+        const h = new Date();
+        $('#d-de').value = dataParaCampo(new Date(h.getFullYear(), h.getMonth(), h.getDate() - 29));
+        $('#d-ate').value = dataParaCampo(h);
+      }
+      renderizarDashboard();
+    });
+    ['#d-de', '#d-ate'].forEach(s => $(s).addEventListener('change', renderizarDashboard));
+    $('#d-recarregar').addEventListener('click', carregarRelatorio);
+
+    // Dica das barras: uma só, que acompanha o mouse; a tabela mostra os mesmos números
+    $('#d-conteudo').addEventListener('mousemove', ev => {
+      const alvo = ev.target.closest('[data-dica]');
+      const dica = $('#dica-grafico');
+      if (!alvo) return dica.classList.add('oculto');
+      dica.innerHTML = alvo.dataset.dica;
+      dica.classList.remove('oculto');
+      const x = Math.min(ev.clientX + 12, window.innerWidth - dica.offsetWidth - 8);
+      dica.style.left = Math.max(8, x) + 'px';
+      dica.style.top = Math.max(8, ev.clientY - dica.offsetHeight - 12) + 'px';
+    });
+    $('#d-conteudo').addEventListener('mouseleave', () => $('#dica-grafico').classList.add('oculto'));
 
     // ---------- Detalhe ----------
 
