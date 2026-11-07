@@ -482,25 +482,65 @@
       form.classList.remove('oculto');
     });
   </script>
+  <style>
+    .tela-carregando body > main, .tela-carregando body > section { display: none; }
+  </style>
   <script>
-    // Busca no Google os dados da tela (equipe, categorias...) e só então roda o script da página
-    (async function () {
+    // Os dados da tela (equipe, categorias...) quase nunca mudam: ficam guardados neste navegador
+    // e a tela abre na hora. O Google é consultado em segundo plano, para pegar o que mudou.
+    (function () {
       const q = new URLSearchParams(location.search);
       const chave = q.get('equipe');
       const equipe = CHAMADOS.equipes[chave];
       if (!equipe) { location.replace('index.html'); return; }
-      try {
-        const app = await chamarApi(equipe.api, 'dadosTela', ['abrir']);
+      const raiz = document.documentElement;
+      const MEMORIA_TELA = 'chamados.tela.' + chave + '.abrir';
+
+      let usou = false;
+      ['pointerdown', 'keydown', 'input'].forEach(tipo =>
+        document.addEventListener(tipo, () => { usou = true; }, { capture: true, once: true }));
+      // Sem o script da página, enviar o formulário recarregaria o endereço sem a equipe
+      document.addEventListener('submit', ev => { if (!window.APP) ev.preventDefault(); }, true);
+
+      function lerGuardado() {
+        try {
+          const json = localStorage.getItem(MEMORIA_TELA);
+          JSON.parse(json).equipe;
+          return json;
+        } catch (e) { return null; }
+      }
+      function iniciarTela(app) {
         window.APP = Object.assign(app, { api: equipe.api, chave: chave, protocolo: q.get('protocolo') || '' });
         document.title = 'Chamados de ' + app.equipe + ' — ' + app.unidade;
         const s = document.createElement('script');
         s.textContent = document.getElementById('principal').textContent;
         document.body.appendChild(s);
-      } catch (e) {
-        document.body.insertAdjacentHTML('beforeend',
-          '<div class="container"><div class="alerta alerta-erro">Não foi possível carregar o sistema de chamados: ' +
-          esc(mensagemErro(e)) + '</div></div>');
       }
+
+      const guardado = lerGuardado();
+      if (guardado) {
+        iniciarTela(JSON.parse(guardado));
+      } else {
+        raiz.classList.add('tela-carregando');
+        document.body.insertAdjacentHTML('beforeend',
+          '<div class="container" id="aviso-tela"><div class="alerta alerta-info"><span class="girando"></span> Carregando…</div></div>');
+      }
+
+      chamarApi(equipe.api, 'dadosTela', ['abrir']).then(app => {
+        const json = JSON.stringify(app);
+        try { localStorage.setItem(MEMORIA_TELA, json); } catch (e) { /* sem armazenamento: consulta o Google a cada visita */ }
+        if (!guardado) {
+          document.getElementById('aviso-tela').remove();
+          raiz.classList.remove('tela-carregando');
+          iniciarTela(app);
+        } else if (json !== guardado && !usou) {
+          location.reload(); // mudou algo e a pessoa ainda não mexeu na tela; se mexeu, vale na próxima visita
+        }
+      }).catch(e => {
+        if (guardado) return; // a tela já funciona; o erro aparece se a pessoa tentar enviar algo
+        document.getElementById('aviso-tela').innerHTML = '<div class="alerta alerta-erro">Não foi possível carregar o sistema de chamados: ' +
+          esc(mensagemErro(e)) + ' <a href="javascript:location.reload()">Tentar de novo</a></div>';
+      });
     })();
   </script>
 </body>
