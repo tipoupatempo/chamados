@@ -264,9 +264,9 @@
   <main class="container">
     <div class="cartao">
       <h1>Acompanhar chamado</h1>
-      <p class="sub">Digite o número do protocolo que você recebeu ao abrir o chamado.</p>
+      <p class="sub">Digite o protocolo completo que você recebeu ao abrir o chamado, com as letras do final.</p>
       <form id="form" class="busca">
-        <input type="search" id="protocolo" placeholder="Ex.: TI-2026-0001" maxlength="20" aria-label="Protocolo" autocomplete="off">
+        <input type="search" id="protocolo" placeholder="Ex.: TI-2026-0001-K7QX" maxlength="20" aria-label="Protocolo" autocomplete="off">
         <button class="botao botao-primario" id="buscar">Consultar</button>
       </form>
     </div>
@@ -280,12 +280,12 @@
     const $ = s => document.querySelector(s);
 
     preencherCabecalho();
-    $('#protocolo').placeholder = 'Ex.: ' + (APP.equipe === 'TI' ? 'TI' : 'MAN') + '-' + new Date().getFullYear() + '-0001';
+    $('#protocolo').placeholder = 'Ex.: ' + (APP.equipe === 'TI' ? 'TI' : 'MAN') + '-' + new Date().getFullYear() + '-0001-K7QX';
     $('#link-abrir').href = link('abrir');
 
     function renderizar(c) {
       if (!c) {
-        $('#resultado').innerHTML = '<div class="alerta alerta-erro">Nenhum chamado encontrado com esse protocolo. Confira o número.</div>';
+        $('#resultado').innerHTML = '<div class="alerta alerta-erro">Nenhum chamado encontrado com esse protocolo. Confira o número e as letras do final.</div>';
         return;
       }
       const historico = c.historico.slice().reverse().map(h =>
