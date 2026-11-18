@@ -108,3 +108,8 @@ Os endereços antigos do Google (`.../exec`, `.../exec?p=consulta`, `.../exec?p=
 
 - [`chamados-apps-script`](https://github.com/tipoupatempo/chamados-apps-script) — código do Google (planilha, API, e-mails) e telas de origem.
 - [`requisicoes`](https://github.com/tipoupatempo/requisicoes) — sistema de requisições, com o mesmo modelo de telas no GitHub Pages.
+
+## Autoria
+
+Desenvolvido por **Kaik Gabriel Carvalho Oliveira** · TI · FUABC / Prefeitura de Santo André.
+O histórico de commits deste repositório registra a data de cada parte.
